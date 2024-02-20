@@ -3,7 +3,7 @@
 ## Introduction
 
 The Payment Loyalty Sample App demonstrates the implementation of triggers to manage loyalty points
-for customers based on their payment transactions.
+for customers based on their payment transactions my mocking the data.
 
 ## Table of Contents
 
