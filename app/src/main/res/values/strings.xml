@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">PL Sample</string>
+    <string name="post_card">Post Card</string>
+    <string name="post_amount">Post Amount</string>
+    <string name="post_transaction">Post Transaction</string>
+    <string name="stop_transaction">Stop</string>
+    <string name="start_transaction">Start</string>
+    <string name="enter_amount">Enter Amount</string>
+    <string name="enter_card_token">Enter Card</string>
+    <string name="transaction_screen">Transaction Screen</string>
+    <string name="trigger_status_will_be_updated_here">Trigger status will be updated here</string>
+    <string name="reset_data">Reset Data</string>
+    <string name="service_based_approach">Service Based Approach</string>
+    <string name="broadcast_based_approach">Broadcast Based Approach</string>
+</resources>
