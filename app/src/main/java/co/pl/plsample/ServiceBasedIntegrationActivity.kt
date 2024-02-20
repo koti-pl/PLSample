@@ -12,12 +12,14 @@ import android.os.Message
 import android.os.Messenger
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.lifecycleScope
 import co.pl.plsample.plSDK.PLTrigger
 import co.pl.plsample.plSDK.PLTriggerResponse
 import co.pl.plsample.plSDK.PLIntentTrigger
+import co.pl.plsample.plSDK.PLIntentsFilters
+import co.pl.plsample.plSDK.PLStatus
+import co.pl.plsample.plSDK.V2Trigger
 import co.pl.plsample.plSDK.isPLMInstalled
 import co.pl.plsample.plSDK.openPLMApp
 import kotlinx.coroutines.launch
@@ -36,7 +38,7 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
             handleVisibility()
             updateTriggerResponse(
                 PLTriggerResponse(
-                    status = PLTrigger.Companion.Trigger.Status.RECEIVED_TRIGGER,
+                    status = PLStatus.RECEIVED_TRIGGER,
                     discount = null,
                     message = "Server Connected"
                 )
@@ -132,8 +134,8 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
 
     private fun startTransaction() {
         if (isPLMInstalled(packageManager)) {
-            val intent = Intent(PLTrigger.TRIGGER_ACTION)
-            intent.setPackage(PLTrigger.APP_PACKAGE)
+            val intent = Intent(PLIntentsFilters.TRIGGER_ACTION)
+            intent.setPackage(PLIntentsFilters.APP_ID)
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         } else {
             showError("PLM Not available")
@@ -162,11 +164,14 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
             val serverResponse = msg.data.getPostAmountEntryResponse()
             Log.d("Trigger Received", "response: $serverResponse")
             when (msg.what) {
-                PLTrigger.Companion.Trigger.Status.RECEIVED_TRIGGER -> updateTriggerResponse(
-                    serverResponse
-                )
+                PLStatus.RECEIVED_TRIGGER -> {
+                    //When we receive the status as RECEIVED_TRIGGER it means payment loyalty app received your request
+                    updateTriggerResponse(
+                        serverResponse
+                    )
+                }
 
-                PLTrigger.Companion.Trigger.Status.LAUNCH_LOYALTY -> {
+                PLStatus.OPEN_APP -> {
                     updateTriggerResponse(serverResponse)
                     amount?.let {
                         openPLMApp(
@@ -178,19 +183,34 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
                     }
                 }
 
-                PLTrigger.Companion.Trigger.Status.REWARD -> updateTriggerResponse(serverResponse)
-                PLTrigger.Companion.Trigger.Status.ERROR -> updateTriggerResponse(serverResponse)
+                PLStatus.REWARD -> {
+                    //If there is any reward you can adjust the amount and continue payment
+                    processTheReward(serverResponse)
+                    updateTriggerResponse(serverResponse)
+                }
+
+                PLStatus.FAIL ->{
+                    //When we receive the status as FAIL, Means there is no reward or some unexpected error happened, So you can continue with payment
+                    updateTriggerResponse(serverResponse)
+                    //Continue with payment
+                }
                 else -> super.handleMessage(msg)
             }
         }
     }
 
+    fun processTheReward(response: PLTriggerResponse) {
+        //If we receive the any discount need to append and continue to payment
+        val discountAmount = (response.discount ?: "0").trim()
+        adjustTheAmount(discountAmount)
+    }
+
 }
 
 fun Bundle.getPostAmountEntryResponse(): PLTriggerResponse {
-    val status = getInt(PLTrigger.Companion.Trigger.Params.STATUS)
-    val message = getString(PLTrigger.Companion.Trigger.Params.MESSAGE)
-    val discount = getString(PLTrigger.Companion.Trigger.Params.DISCOUNT_AMOUNT)
+    val status = getInt(V2Trigger.Params.STATUS)
+    val message = getString(V2Trigger.Params.MESSAGE)
+    val discount = getString(V2Trigger.Params.DISCOUNT_AMOUNT)
     return PLTriggerResponse(
         status = status,
         discount = discount,

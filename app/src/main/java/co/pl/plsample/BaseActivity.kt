@@ -3,7 +3,6 @@ package co.pl.plsample
 import android.app.Activity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -12,8 +11,7 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.lifecycleScope
 import co.pl.plsample.plSDK.PLIntentParamKey
-import co.pl.plsample.plSDK.PLIntentTrigger
-import co.pl.plsample.plSDK.PLTrigger
+import co.pl.plsample.plSDK.PLStatus
 import co.pl.plsample.plSDK.PLTriggerResponse
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -32,26 +30,33 @@ abstract class BaseActivity : AppCompatActivity() {
 
     var activeTrigger: String = ""
 
+
+    //views
+
+    lateinit var tvTriggerAcknowledgment: AppCompatTextView
+
+    lateinit var etAmount: AppCompatEditText
+    lateinit var etCardToken: AppCompatEditText
+
+    //transaction control
+    lateinit var btnStartTransaction: AppCompatButton
+    lateinit var btnStopTransaction: AppCompatButton
+
+    //transaction status control
+    lateinit var btnPostAmount: AppCompatButton
+    lateinit var btnPostCardPresent: AppCompatButton
+    lateinit var btnPostTransaction: AppCompatButton
+
+
     /** launch module nom and on back kill app activity*/
     var activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.let {
-                    val status = it.getIntExtra(PLTrigger.Companion.Trigger.Params.STATUS, 0)
-                    if (status == PLTrigger.Companion.Trigger.Status.REWARD) {
-                        val discountAmount =
-                            (it.getStringExtra(PLIntentParamKey.DISCOUNT)
-                                ?: "0").toDouble()
-                        if (discountAmount > 0) {
-                            val totalAmount = (amount ?: "0").toDouble()
-                            val adjustedAmount = (totalAmount - discountAmount).toString()
-                            Log.i(TAG, "Adjusted amount $adjustedAmount")
-                            bindNewAmount(adjustedAmount)
-                        } else {
-                            Log.e(TAG, "continue payment==>")
-                            // Process with actual amount (no reward)
-                            // You might want to include your actual amount processing logic here
-                        }
+                    val status = it.getIntExtra(PLIntentParamKey.STATUS, 0)
+                    if (status == PLStatus.REWARD) {
+                        val discountAmount = (it.getStringExtra(PLIntentParamKey.DISCOUNT)?: "0").trim()
+                        adjustTheAmount(discountAmount)
                     } else {
                         Log.e(TAG, "continue payment==>")
                         // Process with actual amount (no reward)
@@ -69,22 +74,21 @@ abstract class BaseActivity : AppCompatActivity() {
             }
         }
 
-
-    //views
-
-    lateinit var tvTriggerAcknowledgment: AppCompatTextView
-
-    lateinit var etAmount: AppCompatEditText
-    lateinit var etCardToken: AppCompatEditText
-
-    //transaction control
-    lateinit var btnStartTransaction: AppCompatButton
-    lateinit var btnStopTransaction: AppCompatButton
-
-    //transaction status control
-    lateinit var btnPostAmount: AppCompatButton
-    lateinit var btnPostCardPresent: AppCompatButton
-    lateinit var btnPostTransaction: AppCompatButton
+    fun adjustTheAmount(discountAmount: String){
+        lifecycleScope.launch {
+            val discount = discountAmount.toDouble()
+            if (discount > 0) {
+                val totalAmount = (amount ?: "0").toDouble()
+                val adjustedAmount = (totalAmount - discount).toString()
+                Log.i(TAG, "Adjusted amount $adjustedAmount")
+                etAmount.setText(adjustedAmount)
+            } else {
+                Log.e(TAG, "continue payment==>")
+                // Process with actual amount (no reward)
+                // You might want to include your actual amount processing logic here
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,12 +158,6 @@ abstract class BaseActivity : AppCompatActivity() {
         tvTriggerAcknowledgment.setText(R.string.trigger_status_will_be_updated_here)
     }
 
-    private fun bindNewAmount(adjustedAmount: String) {
-        lifecycleScope.launch {
-            etAmount.setText(adjustedAmount)
-        }
-    }
-
     fun showError(message: String) {
         Snackbar.make(
             this,
@@ -169,6 +167,7 @@ abstract class BaseActivity : AppCompatActivity() {
         ).show()
     }
 
+    //handle this methode as needed
     fun updateTriggerResponse(response: PLTriggerResponse) {
         lifecycleScope.launch {
             tvTriggerAcknowledgment.text = "Received : ${response}"

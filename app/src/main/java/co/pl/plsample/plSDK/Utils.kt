@@ -1,10 +1,5 @@
 package co.pl.plsample.plSDK
 
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-
-
 /**
  * @file Utils
  * Created by Payment Loyalty on 19/12/2023.
@@ -23,6 +18,9 @@ object PLIntentsFilters{
 
     //Payment loyalty broadcast status(PLStatus) of loyalty execution
     const val PL_CONFIRMATION_ACTION = "com.payment.confirm"
+
+    //Payment loyalty service Action
+    val TRIGGER_ACTION = "co.paymentLoyalty.action.trigger"
 }
 
 object PLIntentTrigger{
@@ -37,21 +35,29 @@ object PLIntentParamKey {
     const val DISCOUNT = "discount_amount"
     const val LAUNCH_FROM = "launch_from"
     const val STATUS = "status"
-    const val TRANSACTION_ID = "transaction_id"
 }
 
 object PLStatus {
     const val NO_ACTION_NEEDED = 0
+    const val RECEIVED_TRIGGER = 1
     const val FAIL = 3
-    const val DENIED = 4
     const val REWARD = 5
     const val OPEN_APP = 6
 }
 
-object PLIntent {
-    val PL_OPEN_APP = "co.pl.action.openApp"
-    val PL_FAIL = "co.pl.action.fail"
-    val PL_REWARD = "co.pl.action.reward"
-    val PL_DENIED = "co.pl.action.denied"
-    val PL_NO_ACTION_NEEDED = "co.pl.action.silent"
+object V2Trigger {
+    const val POST_AMOUNT = 1
+    const val POST_CARD_PRESENT = 2
+    const val POST_TRANSACTION = 3
+
+    object Params {
+        const val AMOUNT = "amount"
+        const val CARD_TOKEN = "cardToken"
+        const val CARD_TYPE = "cardType"
+        const val TRANSACTION_ID = "transactionId"
+        const val TRANSACTION_STATUS = "transactionStatus"
+        const val DISCOUNT_AMOUNT = "discount_amount"
+        const val STATUS = "status"
+        const val MESSAGE = "message"
+    }
 }

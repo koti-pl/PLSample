@@ -18,18 +18,18 @@ class PLTrigger(
 ) {
     fun sendPostAmount(amount: String) {
         val data = bundleOf(
-            Trigger.Params.AMOUNT to amount,
+            V2Trigger.Params.AMOUNT to amount,
         )
-        sendTrigger(Trigger.POST_AMOUNT, data)
+        sendTrigger(V2Trigger.POST_AMOUNT, data)
     }
 
     fun sendPostCard(amount: String, cardToken: String, cardType: String) {
         val data = bundleOf(
-            Trigger.Params.AMOUNT to amount,
-            Trigger.Params.CARD_TOKEN to cardToken,
-            Trigger.Params.CARD_TYPE to cardType
+            V2Trigger.Params.AMOUNT to amount,
+            V2Trigger.Params.CARD_TOKEN to cardToken,
+            V2Trigger.Params.CARD_TYPE to cardType
         )
-        sendTrigger(Trigger.POST_CARD_PRESENT, data)
+        sendTrigger(V2Trigger.POST_CARD_PRESENT, data)
     }
 
     fun sendPostTransaction(
@@ -39,12 +39,12 @@ class PLTrigger(
         transactionStatus: Boolean
     ) {
         val data = bundleOf(
-            Trigger.Params.AMOUNT to amount,
-            Trigger.Params.CARD_TOKEN to cardToken,
-            Trigger.Params.TRANSACTION_STATUS to transactionStatus,
-            Trigger.Params.TRANSACTION_ID to transactionId
+            V2Trigger.Params.AMOUNT to amount,
+            V2Trigger.Params.CARD_TOKEN to cardToken,
+            V2Trigger.Params.TRANSACTION_STATUS to transactionStatus,
+            V2Trigger.Params.TRANSACTION_ID to transactionId
         )
-        sendTrigger(Trigger.POST_TRANSACTION, data)
+        sendTrigger(V2Trigger.POST_TRANSACTION, data)
     }
 
 
@@ -63,38 +63,5 @@ class PLTrigger(
             e.printStackTrace()
         }
     }
-
-    companion object {
-
-        val TRIGGER_ACTION = "co.paymentLoyalty.action.trigger"
-        val APP_PACKAGE = "com.winloyalty"
-
-        object Trigger {
-
-            const val NONE = 0
-            const val POST_AMOUNT = 1
-            const val POST_CARD_PRESENT = 2
-            const val POST_TRANSACTION = 3
-
-            object Status {
-                const val ERROR = 0
-                const val LAUNCH_LOYALTY = 1    //launch payment loyalty app to launch reward UI
-                const val RECEIVED_TRIGGER = 3  //Acknowledgement of each trigger
-                const val REWARD = 5  // user has some reward
-            }
-
-            object Params {
-                const val AMOUNT = "amount"
-                const val CARD_TOKEN = "cardToken"
-                const val CARD_TYPE = "cardType"
-                const val TRANSACTION_ID = "transactionId"
-                const val TRANSACTION_STATUS = "transactionStatus"
-                const val DISCOUNT_AMOUNT = "discount_amount"
-                const val STATUS = "status"
-                const val MESSAGE = "message"
-            }
-        }
-    }
-
 
 }

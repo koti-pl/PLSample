@@ -1,11 +1,20 @@
 package co.pl.plsample
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.view.View
 import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.lifecycleScope
+import co.pl.plsample.plSDK.PLIntentParamKey
+import co.pl.plsample.plSDK.PLIntentTrigger
+import co.pl.plsample.plSDK.PLStatus
 import co.pl.plsample.plSDK.PLTriggerResponse
+import co.pl.plsample.plSDK.openPLMApp
 import co.pl.plsample.plSDK.postCardPresent
 import kotlinx.coroutines.launch
+
 
 /**
  * @file BroadcastBasedIntegrationActivity
@@ -25,20 +34,24 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
     }
 
     override fun postAmountEntered(amount: String) {
-        val status = co.pl.plsample.plSDK.postAmountEntered(this,amount)
-        if(status){
+        val status = co.pl.plsample.plSDK.postAmountEntered(this, amount)
+        if (status) {
             updateTriggerResponse(getBroadCastSuccessResponse("Post amount trigger sent"))
-        }else{
+            activeTrigger = PLIntentTrigger.POST_AMOUNT_ENTRY
+        } else {
             //continue payment
+            showError("Fail to send postAmount trigger")
         }
     }
 
     override fun postCardPresented(amount: String, cardToken: String, cardType: String?) {
-        val status = postCardPresent(this,cardToken,amount)
-        if(status){
+        val status = postCardPresent(this, cardToken, amount)
+        if (status) {
             updateTriggerResponse(getBroadCastSuccessResponse("Post card present trigger sent"))
-        }else{
+            activeTrigger = PLIntentTrigger.POST_CARD_PRESENTED
+        } else {
             //continue payment
+            showError("Fail to send postCard trigger")
         }
     }
 
@@ -48,19 +61,69 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
         transactionId: String?,
         transactionStatus: Boolean
     ) {
-        val status = co.pl.plsample.plSDK.postTransaction(this,cardToken, amount)
-        if(status){
+        val status = co.pl.plsample.plSDK.postTransaction(this, cardToken, amount)
+        if (status) {
             updateTriggerResponse(getBroadCastSuccessResponse("Post transaction trigger sent"))
-        }else{
+            activeTrigger = PLIntentTrigger.POST_TRANSACTION
+        } else {
             //continue payment
+            showError("Fail to send postTransaction trigger")
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerReceiver()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(statusBroadcastReceiver)
+    }
+
+    // Register the confirmation action receiver
+    private fun registerReceiver(){
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("com.payment.confirm")
+        registerReceiver(statusBroadcastReceiver, intentFilter)
+    }
+
+
+    private val statusBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            handleLegacy(intent)
+        }
+    }
+    private fun handleLegacy(intent: Intent) {
+        when (intent.getIntExtra(PLIntentParamKey.STATUS, PLStatus.NO_ACTION_NEEDED)) {
+            PLStatus.REWARD -> {
+                //If we receive the any discount need to append and continue to payment
+                val discountAmount = (intent.getStringExtra(PLIntentParamKey.DISCOUNT)?: "0").trim()
+                adjustTheAmount(discountAmount)
+            }
+
+            PLStatus.OPEN_APP -> {
+                amount?.let {
+                    openPLMApp(
+                        launcher = activityResultLauncher,
+                        amount = it,
+                        cardToken = cardToken,
+                        launchFrom = activeTrigger
+                    )
+                }
+            }
+
+            else ->{
+                //continue to payment
+            }
         }
     }
 
     private fun getBroadCastSuccessResponse(
-        message:String = "Broadcast Sent"
+        message: String = "Broadcast Sent"
     ) = PLTriggerResponse(
         status = 0,
         discount = "0",
-        message = "Broadcast Sent"
+        message = message
     )
 }
