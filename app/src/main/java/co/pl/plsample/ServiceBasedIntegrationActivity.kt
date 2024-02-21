@@ -157,7 +157,7 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
             serverMessenger = null
             handleVisibility()
         } ?: run {
-            showError("PLM Not available")
+            showError("PLM Not running!")
         }
     }
 

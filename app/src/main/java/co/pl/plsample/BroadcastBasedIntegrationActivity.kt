@@ -12,7 +12,9 @@ import co.pl.plsample.plSDK.PLIntentTrigger
 import co.pl.plsample.plSDK.PLStatus
 import co.pl.plsample.plSDK.PLTriggerResponse
 import co.pl.plsample.plSDK.openPLMApp
-import co.pl.plsample.plSDK.postCardPresent
+import co.pl.plsample.plSDK.sendPostAmountEntered
+import co.pl.plsample.plSDK.sendPostCardPresent
+import co.pl.plsample.plSDK.sendPostTransaction
 import kotlinx.coroutines.launch
 
 
@@ -34,7 +36,8 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
     }
 
     override fun postAmountEntered(amount: String) {
-        val status = co.pl.plsample.plSDK.postAmountEntered(this, amount)
+
+        val status = sendPostAmountEntered(amount)
         if (status) {
             updateTriggerResponse(getBroadCastSuccessResponse("Post amount trigger sent"))
             activeTrigger = PLIntentTrigger.POST_AMOUNT_ENTRY
@@ -45,7 +48,7 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
     }
 
     override fun postCardPresented(amount: String, cardToken: String, cardType: String?) {
-        val status = postCardPresent(this, cardToken, amount)
+        val status = sendPostCardPresent(cardToken,cardType,amount)
         if (status) {
             updateTriggerResponse(getBroadCastSuccessResponse("Post card present trigger sent"))
             activeTrigger = PLIntentTrigger.POST_CARD_PRESENTED
@@ -62,8 +65,7 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
         transactionId: String?,
         transactionStatus: Boolean
     ) {
-        val status = co.pl.plsample.plSDK.postTransaction(
-            context = this,
+        val status = sendPostTransaction(
             cardToken=cardToken,
             cardType = cardType,
             amount = amount,
