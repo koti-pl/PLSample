@@ -56,7 +56,7 @@ We can send Triggers by using
 
 ### [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts) : Use the following code snippets to send T1,T2 and T3 triggers
 
-i. Post Amount Trigger(T1)
+#### Post Amount Trigger(T1)
 ```sh
 /**
  * Posts the entered amount information to the Payment Loyalty Module (PLM) app if installed on the device.
@@ -88,7 +88,7 @@ fun Context.sendPostAmountEntered(
 }
 ```
 
-ii. Post Card Present(T2)
+#### Post Card Present(T2)
 ```sh
 /**
  * Posts information about a card presentation event to the Payment Loyalty Module (PLM) app if installed on the device.
@@ -126,7 +126,7 @@ fun Context.sendPostCardPresent(
 }
 ```
 
-iii. Post Transaction(T3)
+#### Post Transaction(T3)
 ```sh
 /**
  * Posts a transaction to the Payment Loyalty Module (PLM) app if installed on the device.
