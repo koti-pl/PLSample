@@ -81,14 +81,10 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
         }
     }
 
+    //Register receiver on start of the view
     override fun onStart() {
         super.onStart()
         registerReceiver()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(statusBroadcastReceiver)
     }
 
     // Register the confirmation action receiver
@@ -101,10 +97,12 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
 
     private val statusBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            handleLegacy(intent)
+            handleTriggerResponse(intent)
         }
     }
-    private fun handleLegacy(intent: Intent) {
+
+    //Handle the response from payment loyalty
+    private fun handleTriggerResponse(intent: Intent) {
         when (intent.getIntExtra(PLIntentParamKey.STATUS, PLStatus.NO_ACTION_NEEDED)) {
             PLStatus.REWARD -> {
                 //If we receive the any discount need to append and continue to payment
@@ -127,6 +125,12 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
                 //continue to payment
             }
         }
+    }
+
+    //Unregister Receiver
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(statusBroadcastReceiver)
     }
 
     private fun getBroadCastSuccessResponse(

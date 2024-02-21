@@ -33,13 +33,13 @@ git clone https://github.com/koti-pl/PLSample.git
    identification process, ensuring that users are offered relevant benefits corresponding to their
    transaction amount and the merchant's loyalty program.
 
-2. **Post Card((T1)):** Upon successful authentication of the user's card, this trigger is need to send to the
+2. **Post Card(T2):** Upon successful authentication of the user's card, this trigger is need to send to the
    payment loyalty app. It prompts the app to query its available rewards associated with the
    specific card. This ensures that users are promptly notified of any potential rewards or benefits
    they can avail themselves of with their authenticated card, enhancing the overall user experience
    and Motivating card usage.
 
-3. **Post Transaction((T3)):** Following the completion of a transaction, this trigger need to send. Its
+3. **Post Transaction(T3):** Following the completion of a transaction, this trigger need to send. Its
    purpose is to facilitate various post-transaction activities within the Payment Loyalty ecosystem.
    Specifically, it enables the payment loyalty app to mark the status of any associated coupons or
    rewards, ensuring accurate tracking and management of redeemed offers. Additionally, it allows
@@ -57,7 +57,7 @@ We can send Triggers by using
 ### [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts) : Use the following code snippets to send T1,T2 and T3 triggers
 
 #### Post Amount Trigger(T1)
-```sh
+```kotlin
 /**
  * Posts the entered amount information to the Payment Loyalty Module (PLM) app if installed on the device.
  *
@@ -89,7 +89,7 @@ fun Context.sendPostAmountEntered(
 ```
 
 #### Post Card Present(T2)
-```sh
+```kotlin
 /**
  * Posts information about a card presentation event to the Payment Loyalty Module (PLM) app if installed on the device.
  *
@@ -127,7 +127,7 @@ fun Context.sendPostCardPresent(
 ```
 
 #### Post Transaction(T3)
-```sh
+```kotlin
 /**
  * Posts a transaction to the Payment Loyalty Module (PLM) app if installed on the device.
  *
@@ -162,4 +162,63 @@ fun Context.sendPostTransaction(
     }
 }
 ```
+
+#### Register Broadcast to receive the intents from Payment loyalty application with and unregister on destroy / detaching the view 
+```kotlin
+  //Register receiver on start of the view 
+override fun onStart() {
+   super.onStart()
+   registerReceiver()
+}
+
+// Register the confirmation action receiver
+private fun registerReceiver(){
+   val intentFilter = IntentFilter()
+   intentFilter.addAction("com.payment.confirm")
+   registerReceiver(statusBroadcastReceiver, intentFilter)
+}
+
+
+private val statusBroadcastReceiver = object : BroadcastReceiver() {
+   override fun onReceive(context: Context, intent: Intent) {
+      handleTriggerResponse(intent)
+   }
+}
+
+//Handle the response from payment loyalty
+private fun handleTriggerResponse(intent: Intent) {
+   when (intent.getIntExtra(PLIntentParamKey.STATUS, PLStatus.NO_ACTION_NEEDED)) {
+      PLStatus.REWARD -> {
+         //If we receive the any discount need to append and continue to payment
+         val discountAmount = (intent.getStringExtra(PLIntentParamKey.DISCOUNT)?: "0").trim()
+         adjustTheAmount(discountAmount)
+      }
+
+      PLStatus.OPEN_APP -> {
+         amount?.let {
+            openPLMApp(
+               launcher = activityResultLauncher,
+               amount = it,
+               cardToken = cardToken,
+               launchFrom = activeTrigger
+            )
+         }
+      }
+
+      else ->{
+         //continue to payment
+      }
+   }
+}
+
+//Unregister Receiver
+override fun onDestroy() {
+   super.onDestroy()
+   unregisterReceiver(statusBroadcastReceiver)
+}
+```
+
+
+
+
 
