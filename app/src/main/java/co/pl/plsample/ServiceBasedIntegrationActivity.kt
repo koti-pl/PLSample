@@ -125,7 +125,7 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
     override fun handleAdditionalTransactionsControllers() {
 
         btnStartTransaction.setOnClickListener {
-            startTransaction()
+            startService()
         }
 
         btnStopTransaction.setOnClickListener {
@@ -134,7 +134,7 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
 
     }
 
-    private fun startTransaction() {
+    private fun startService() {
         if (isPLMInstalled(packageManager)) {
             val intent = Intent(PLIntentsFilters.TRIGGER_ACTION)
             intent.setPackage(PLIntentsFilters.APP_ID)
