@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">PL Sample</string>
-    <string name="post_card">Post Card</string>
-    <string name="post_amount">Post Amount</string>
-    <string name="post_transaction">Post Transaction</string>
+    <string name="post_card">Post Card(T2)</string>
+    <string name="post_amount">Post Amount(T1)</string>
+    <string name="post_transaction">Post Transaction(T3)</string>
     <string name="stop_transaction">Stop</string>
     <string name="start_transaction">Start</string>
     <string name="enter_amount">Enter Amount</string>
