@@ -10,7 +10,11 @@ object PLIntentsFilters{
     //payment app package id
     const val APP_ID = "com.winloyalty"
 
-    //intent filter to send intents to loyalty application
+
+    //Payment loyalty trigger Action [works for both broadcast and service]
+    val TRIGGER_ACTION = "co.paymentLoyalty.action.trigger"
+
+    //intent filter to send intents to loyalty application [Deprecated only works with broadcast]
     const val PL_TRIGGER_INTENT_ACTION = "com.nominateloyalty.confirm"
 
     //intent filter to open the loyalty app on specified trigger
@@ -19,8 +23,6 @@ object PLIntentsFilters{
     //Payment loyalty broadcast status(PLStatus) of loyalty execution
     const val PL_CONFIRMATION_ACTION = "com.payment.confirm"
 
-    //Payment loyalty service Action
-    val TRIGGER_ACTION = "co.paymentLoyalty.action.trigger"
 }
 
 object PLIntentTrigger{

@@ -12,7 +12,7 @@ import androidx.core.os.bundleOf
  * Created by Payment Loyalty on 19/02/2024.
  * Description: Helper class to send triggers to Payment Loyalty
  */
-class PLTrigger(
+class PLV2Triggers(
     val serviceMessenger: Messenger,
     val clientMessenger: Messenger,
 ) {
@@ -35,12 +35,14 @@ class PLTrigger(
     fun sendPostTransaction(
         amount: String,
         cardToken: String,
+        cardType: String?=null,
         transactionId: String? = null,
         transactionStatus: Boolean
     ) {
         val data = bundleOf(
             V2Trigger.Params.AMOUNT to amount,
             V2Trigger.Params.CARD_TOKEN to cardToken,
+            V2Trigger.Params.CARD_TYPE to cardType,
             V2Trigger.Params.TRANSACTION_STATUS to transactionStatus,
             V2Trigger.Params.TRANSACTION_ID to transactionId
         )

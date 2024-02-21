@@ -26,7 +26,7 @@ fun postAmountEntered(
     // Check if the PLM app is installed on the device
     return if (isPLMInstalled(context.packageManager)) {
         // Create an intent to trigger the PLM app with the entered amount details
-        val intent = Intent(PLIntentsFilters.PL_TRIGGER_INTENT_ACTION).apply {
+        val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
             putExtra(PLIntentParamKey.AMOUNT, amount)
             putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_AMOUNT_ENTRY)
             addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES) // Ensure the intent is delivered to the PLM app
@@ -60,7 +60,7 @@ fun postCardPresent(
     // Check if the PLM app is installed on the device
     return if (isPLMInstalled(context.packageManager)) {
         // Create an intent to trigger the PLM app with card presentation details
-        val intent = Intent(PLIntentsFilters.PL_TRIGGER_INTENT_ACTION).apply {
+        val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
             putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
             putExtra(PLIntentParamKey.AMOUNT, amount)
             putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_CARD_PRESENTED)
@@ -90,13 +90,19 @@ fun postCardPresent(
 fun postTransaction(
     context: Context,
     cardToken: String,
-    amount: String
+    cardType: String? = null,
+    amount: String,
+    transactionId: String? = null,
+    transactionStatus: Boolean
 ): Boolean {
     return if (isPLMInstalled(context.packageManager)) {
-        val intent = Intent(PLIntentsFilters.PL_TRIGGER_INTENT_ACTION).apply {
+        val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
             putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
             putExtra(PLIntentParamKey.AMOUNT, amount)
             putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_TRANSACTION)
+            putExtra(V2Trigger.Params.TRANSACTION_STATUS , transactionStatus)
+            putExtra(V2Trigger.Params.TRANSACTION_ID , transactionId)
+            putExtra(V2Trigger.Params.CARD_TYPE , cardType)
             addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
         }
         context.sendBroadcast(intent)

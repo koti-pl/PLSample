@@ -137,6 +137,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 postTransaction(
                     amount = etAmount.text.toString(),
                     cardToken = etCardToken.text.toString(),
+                    cardType = "Visa",
                     transactionId = "19071992",
                     transactionStatus = true
                 )
@@ -191,6 +192,7 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun postTransaction(
         amount: String,      //Mandatory :: it should be always available and more than zero(0)
         cardToken: String,   //Mandatory :: unique identifier of the card to identify card to check the reward availability. it should be same always for the same card
+        cardType: String?,   //Not mandatory :: The value is helpfully to providing detailed analytics to the user
         transactionId: String?, //Not mandatory :: The value is helpfully to providing detailed analytics to the user
         transactionStatus: Boolean = true, // Mandatory :: By default we consider it as successful transaction if this value is not passed
     )

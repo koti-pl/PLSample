@@ -58,10 +58,18 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
     override fun postTransaction(
         amount: String,
         cardToken: String,
+        cardType:String?,
         transactionId: String?,
         transactionStatus: Boolean
     ) {
-        val status = co.pl.plsample.plSDK.postTransaction(this, cardToken, amount)
+        val status = co.pl.plsample.plSDK.postTransaction(
+            context = this,
+            cardToken=cardToken,
+            cardType = cardType,
+            amount = amount,
+            transactionId = transactionId,
+            transactionStatus = transactionStatus
+        )
         if (status) {
             updateTriggerResponse(getBroadCastSuccessResponse("Post transaction trigger sent"))
             activeTrigger = PLIntentTrigger.POST_TRANSACTION

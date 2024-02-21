@@ -14,7 +14,7 @@ import android.util.Log
 import android.view.View
 import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.lifecycleScope
-import co.pl.plsample.plSDK.PLTrigger
+import co.pl.plsample.plSDK.PLV2Triggers
 import co.pl.plsample.plSDK.PLTriggerResponse
 import co.pl.plsample.plSDK.PLIntentTrigger
 import co.pl.plsample.plSDK.PLIntentsFilters
@@ -52,15 +52,15 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
         }
     }
 
-    val plTrigger: (serverMessenger: Messenger, incomeMessenger: Messenger) -> PLTrigger =
+    val triggers: (serverMessenger: Messenger, incomeMessenger: Messenger) -> PLV2Triggers =
         { serverMessenger, incomeMessenger ->
-            PLTrigger(serverMessenger, incomeMessenger)
+            PLV2Triggers(serverMessenger, incomeMessenger)
         }
 
     override fun postAmountEntered(amount: String) {
         if (amount.isNotEmpty()) {
             serverMessenger?.let {
-                plTrigger(it, incomeMessenger).sendPostAmount(amount)
+                triggers(it, incomeMessenger).sendPostAmount(amount)
                 activeTrigger = PLIntentTrigger.POST_AMOUNT_ENTRY
             } ?: run {
                 showError(ERROR_SERVICE_NOT_AVAILABLE)
@@ -73,7 +73,7 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
     override fun postCardPresented(amount: String, cardToken: String, cardType: String?) {
         if (amount.isNotEmpty() && cardToken.isNotEmpty()) {
             serverMessenger?.let {
-                plTrigger(it, incomeMessenger).sendPostCard(amount, cardToken, cardType ?: "")
+                triggers(it, incomeMessenger).sendPostCard(amount, cardToken, cardType ?: "")
                 activeTrigger = PLIntentTrigger.POST_CARD_PRESENTED
             } ?: run {
                 showError(ERROR_SERVICE_NOT_AVAILABLE)
@@ -86,14 +86,16 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
     override fun postTransaction(
         amount: String,
         cardToken: String,
+        cardType: String?,
         transactionId: String?,
         transactionStatus: Boolean
     ) {
         if (amount.isNotEmpty() && cardToken.isNotEmpty()) {
             serverMessenger?.let {
-                plTrigger(it, incomeMessenger).sendPostTransaction(
+                triggers(it, incomeMessenger).sendPostTransaction(
                     amount,
                     cardToken,
+                    cardType,
                     transactionId,
                     transactionStatus
                 )
@@ -189,11 +191,12 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
                     updateTriggerResponse(serverResponse)
                 }
 
-                PLStatus.FAIL ->{
+                PLStatus.FAIL -> {
                     //When we receive the status as FAIL, Means there is no reward or some unexpected error happened, So you can continue with payment
                     updateTriggerResponse(serverResponse)
                     //Continue with payment
                 }
+
                 else -> super.handleMessage(msg)
             }
         }
