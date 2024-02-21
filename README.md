@@ -93,7 +93,7 @@ fun Context.sendPostAmountEntered(
 }
 ```
 
-#### Post Card Present(T2)
+#### Post Card Present Trigger(T2)
 
 ```kotlin
 /**
@@ -132,7 +132,7 @@ fun Context.sendPostCardPresent(
 }
 ```
 
-#### Post Transaction(T3)
+#### Post Transaction Trigger(T3)
 
 ```kotlin
 /**
@@ -333,8 +333,133 @@ val triggers: (serverMessenger: Messenger, incomeMessenger: Messenger) -> PLV2Tr
         PLV2Triggers(serverMessenger, incomeMessenger)
     }
 ```
-Refer to [ServiceBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/ServiceBasedIntegrationActivity.kt)
 
+#### Post Amount Trigger(T1)
+
+```kotlin
+override fun postAmountEntered(amount: String) {
+    if (amount.isNotEmpty()) {
+        serverMessenger?.let {
+            triggers(it, incomeMessenger).sendPostAmount(amount)
+            activeTrigger = PLIntentTrigger.POST_AMOUNT_ENTRY
+        } ?: run {
+            showError(ERROR_SERVICE_NOT_AVAILABLE)
+        }
+    } else {
+        showError("Enter valid amount to continue!")
+    }
+}
+```
+
+#### Post Card Present Trigger(T2)
+
+```kotlin
+ override fun postCardPresented(amount: String, cardToken: String, cardType: String?) {
+    if (amount.isNotEmpty() && cardToken.isNotEmpty()) {
+        serverMessenger?.let {
+            triggers(it, incomeMessenger).sendPostCard(amount, cardToken, cardType ?: "")
+            activeTrigger = PLIntentTrigger.POST_CARD_PRESENTED
+        } ?: run {
+            showError(ERROR_SERVICE_NOT_AVAILABLE)
+        }
+    } else {
+        showError("Provide valid amount and cardToken to continue!")
+    }
+}
+```
+
+#### Post Transaction Trigger(T3)
+
+```kotlin
+ override fun postTransaction(
+    amount: String,
+    cardToken: String,
+    cardType: String?,
+    transactionId: String?,
+    transactionStatus: Boolean
+) {
+    if (amount.isNotEmpty() && cardToken.isNotEmpty()) {
+        serverMessenger?.let {
+            triggers(it, incomeMessenger).sendPostTransaction(
+                amount,
+                cardToken,
+                cardType,
+                transactionId,
+                transactionStatus
+            )
+            activeTrigger = PLIntentTrigger.POST_TRANSACTION
+        } ?: run {
+            showError(ERROR_SERVICE_NOT_AVAILABLE)
+        }
+    } else {
+        showError("Invalid data to process the trigger")
+    }
+}
+```
+### How to launch the PLM
+When the payment app receives the trigger status <span id="copyable-word">OPEN_APP = 6</span> then launch the activity using the following code. You will receive the result as 'OK' if there is any reward available.
+
+##### Launching PLM
+```kotlin
+/** activity launcher*/
+    var activityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.let {
+                    val status = it.getIntExtra(PLIntentParamKey.STATUS, 0)
+                    if (status == PLStatus.REWARD) {
+                        val discountAmount = (it.getStringExtra(PLIntentParamKey.DISCOUNT)?: "0").trim()
+                        adjustTheAmount(discountAmount)
+                    } else {
+                        Log.e(TAG, "continue payment==>")
+                        // Process with actual amount (no reward)
+                        // You might want to include your actual amount processing logic here
+                    }
+
+                } ?: run {
+                    Log.e(TAG, "continue payment==>")
+                    // Process with actual amount (no reward)
+                    // You might want to include your actual amount processing logic here
+                }
+
+            } else {
+                // handle error state
+            }
+        }
+
+/**
+ * Opens the Payment Loyalty Module (PLM) app with specified parameters.
+ *
+ * @param launcher The activity result launcher for handling the result of the PLM app launch.
+ * @param amount The amount associated with the transaction.
+ * @param cardToken The token representing the user's card information.
+ * @param launchFrom A string indicating the context or origin of the app launch.
+ * @return Boolean indicating whether the PLM app launch is successful or not.
+ */
+fun openPLMApp(
+   launcher: ActivityResultLauncher<Intent>,
+   amount: String,
+   cardToken: String,
+   launchFrom: String
+): Boolean {
+   try {
+      val intent = Intent(PLIntentsFilters.OPEN_PLM_ACTION).apply {
+         flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+         putExtra(PLIntentParamKey.AMOUNT, amount)
+         putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
+         putExtra(PLIntentParamKey.LAUNCH_FROM, launchFrom)
+      }
+      launcher.launch(intent)
+      return true
+   } catch (e: Exception) {
+      e.printStackTrace()
+   }
+   return false
+}
+
+```
+
+Refer to [ServiceBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/ServiceBasedIntegrationActivity.kt)
 
 ### See [plSDK](https://github.com/koti-pl/PLSample/tree/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK) package for more details about triggers
 

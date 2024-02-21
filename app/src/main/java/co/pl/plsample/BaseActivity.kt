@@ -50,7 +50,7 @@ abstract class BaseActivity : AppCompatActivity() {
     lateinit var btnPostTransaction: AppCompatButton
 
 
-    /** launch module nom and on back kill app activity*/
+    /** activity launcher*/
     var activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
