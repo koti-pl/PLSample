@@ -58,8 +58,6 @@ We can send Triggers by using
 1. [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts)
 2. [Service and Messenger](https://developer.android.com/develop/background-work/services/bound-services)
 
-##### See [plSDK](https://github.com/koti-pl/PLSample/tree/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK) package for more details
-
 ### [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts) : Use the following code snippets to send T1,T2 and T3 triggers by using broadcast intents
 
 #### Post Amount Trigger(T1)
@@ -335,7 +333,9 @@ val triggers: (serverMessenger: Messenger, incomeMessenger: Messenger) -> PLV2Tr
         PLV2Triggers(serverMessenger, incomeMessenger)
     }
 ```
-
 Refer to [ServiceBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/ServiceBasedIntegrationActivity.kt)
+
+
+## See [plSDK](https://github.com/koti-pl/PLSample/tree/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK) package for more details about triggers
 
 
