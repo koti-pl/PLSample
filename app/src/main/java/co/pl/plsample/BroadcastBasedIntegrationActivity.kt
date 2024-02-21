@@ -12,7 +12,9 @@ import co.pl.plsample.plSDK.PLIntentTrigger
 import co.pl.plsample.plSDK.PLStatus
 import co.pl.plsample.plSDK.PLTriggerResponse
 import co.pl.plsample.plSDK.openPLMApp
-import co.pl.plsample.plSDK.postCardPresent
+import co.pl.plsample.plSDK.sendPostAmountEntered
+import co.pl.plsample.plSDK.sendPostCardPresent
+import co.pl.plsample.plSDK.sendPostTransaction
 import kotlinx.coroutines.launch
 
 
@@ -34,7 +36,8 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
     }
 
     override fun postAmountEntered(amount: String) {
-        val status = co.pl.plsample.plSDK.postAmountEntered(this, amount)
+
+        val status = sendPostAmountEntered(amount)
         if (status) {
             updateTriggerResponse(getBroadCastSuccessResponse("Post amount trigger sent"))
             activeTrigger = PLIntentTrigger.POST_AMOUNT_ENTRY
@@ -45,7 +48,7 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
     }
 
     override fun postCardPresented(amount: String, cardToken: String, cardType: String?) {
-        val status = postCardPresent(this, cardToken, amount)
+        val status = sendPostCardPresent(cardToken,cardType,amount)
         if (status) {
             updateTriggerResponse(getBroadCastSuccessResponse("Post card present trigger sent"))
             activeTrigger = PLIntentTrigger.POST_CARD_PRESENTED
@@ -62,8 +65,7 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
         transactionId: String?,
         transactionStatus: Boolean
     ) {
-        val status = co.pl.plsample.plSDK.postTransaction(
-            context = this,
+        val status = sendPostTransaction(
             cardToken=cardToken,
             cardType = cardType,
             amount = amount,
@@ -79,14 +81,10 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
         }
     }
 
+    //Register receiver on start of the view
     override fun onStart() {
         super.onStart()
         registerReceiver()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(statusBroadcastReceiver)
     }
 
     // Register the confirmation action receiver
@@ -99,10 +97,12 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
 
     private val statusBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            handleLegacy(intent)
+            handleTriggerResponse(intent)
         }
     }
-    private fun handleLegacy(intent: Intent) {
+
+    //Handle the response from payment loyalty
+    private fun handleTriggerResponse(intent: Intent) {
         when (intent.getIntExtra(PLIntentParamKey.STATUS, PLStatus.NO_ACTION_NEEDED)) {
             PLStatus.REWARD -> {
                 //If we receive the any discount need to append and continue to payment
@@ -125,6 +125,12 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
                 //continue to payment
             }
         }
+    }
+
+    //Unregister Receiver
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(statusBroadcastReceiver)
     }
 
     private fun getBroadCastSuccessResponse(

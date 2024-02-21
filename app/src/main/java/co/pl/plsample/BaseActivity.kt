@@ -3,6 +3,8 @@ package co.pl.plsample
 import android.app.Activity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -48,7 +50,7 @@ abstract class BaseActivity : AppCompatActivity() {
     lateinit var btnPostTransaction: AppCompatButton
 
 
-    /** launch module nom and on back kill app activity*/
+    /** activity launcher*/
     var activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -92,6 +94,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         setContentView(R.layout.activity_main)
         initViews()
         handleVisibility()
@@ -101,7 +106,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun initViews() {
 
         findViewById<AppCompatImageButton>(R.id.terminateApp).setOnClickListener {
-            onBackPressed()
+            finishAffinity()
         }
 
         tvTriggerAcknowledgment = findViewById(R.id.tvResponse)

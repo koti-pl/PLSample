@@ -7,6 +7,15 @@
     android:background="#0A8FD0"
     tools:context=".SampleLauncherActivity">
 
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/terminateApp"
+        android:layout_width="@dimen/form_element_height"
+        android:layout_height="@dimen/form_element_height"
+        android:background="@color/stop"
+        android:src="@drawable/ic_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/serviceBased"
         android:layout_width="wrap_content"

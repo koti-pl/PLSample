@@ -23,6 +23,13 @@ class PLV2Triggers(
         sendTrigger(V2Trigger.POST_AMOUNT, data)
     }
 
+    /**
+     * Posts information about a card presentation event to the Payment Loyalty Module (PLM) app if installed on the device.
+     *
+     * @param cardToken The token representing the user's card information.
+     * @param cardType The type of the (ex: Visa)
+     * @param amount The amount associated with the card presentation event.
+     */
     fun sendPostCard(amount: String, cardToken: String, cardType: String) {
         val data = bundleOf(
             V2Trigger.Params.AMOUNT to amount,
@@ -32,6 +39,15 @@ class PLV2Triggers(
         sendTrigger(V2Trigger.POST_CARD_PRESENT, data)
     }
 
+    /**
+     * Posts a transaction to the Payment Loyalty Module (PLM) app if installed on the device.
+     *
+     * @param cardToken The token representing the user's card information.
+     * @param cardType The type of the (ex: visa)
+     * @param amount The amount associated with the transaction.
+     * @param transactionId The current transaction id.
+     * @param transactionStatus The current transaction status. If transaction is success then it is true otherwise false
+     */
     fun sendPostTransaction(
         amount: String,
         cardToken: String,
