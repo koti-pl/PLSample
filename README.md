@@ -18,9 +18,7 @@ for customers based on their payment transactions my mocking the data.
 - Demonstrate usage triggers using the service
 
 ## Installation
-
-1. Clone the repository:
-
+Clone the repository:
 ```shell 
 git clone https://github.com/koti-pl/PLSample.git
 ```
@@ -54,14 +52,12 @@ git clone https://github.com/koti-pl/PLSample.git
 ## How To Send Trigger
 
 We can send Triggers by using
-
 1. [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts)
 2. [Service and Messenger](https://developer.android.com/develop/background-work/services/bound-services)
 
 ### [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts) : Use the following code snippets to send T1,T2 and T3 triggers by using broadcast intents
 
 #### Post Amount Trigger(T1)
-
 ```kotlin
 /**
  * Posts the entered amount information to the Payment Loyalty Module (PLM) app if installed on the device.
@@ -92,9 +88,7 @@ fun Context.sendPostAmountEntered(
     }
 }
 ```
-
 #### Post Card Present Trigger(T2)
-
 ```kotlin
 /**
  * Posts information about a card presentation event to the Payment Loyalty Module (PLM) app if installed on the device.
@@ -131,9 +125,7 @@ fun Context.sendPostCardPresent(
     }
 }
 ```
-
 #### Post Transaction Trigger(T3)
-
 ```kotlin
 /**
  * Posts a transaction to the Payment Loyalty Module (PLM) app if installed on the device.
@@ -171,7 +163,6 @@ fun Context.sendPostTransaction(
 ```
 
 #### Register Broadcast to receive the intents from Payment loyalty application with and unregister on destroy / detaching the view
-
 ```kotlin
   //Register receiver on start of the view 
 override fun onStart() {
@@ -233,9 +224,7 @@ every transaction if it's already started and the service connection is availabl
 and receive triggers to PLM, it is mandatory to be connected to the service.
 
 #### Start service
-
 ```kotlin
-
 private var serverMessenger: Messenger? = null
 private val serviceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -268,9 +257,7 @@ private fun startService() {
     }
 }
 ```
-
 #### Stop service
-
 ```kotlin
  private fun stopService() {
     serverMessenger?.let {
@@ -284,7 +271,6 @@ private fun startService() {
 ```
 
 #### Create Handler to receive the data from the PLM
-
 ```kotlin
  inner class IncomingHandler(looper: Looper) : Handler(looper) {
     override fun handleMessage(msg: Message) {
@@ -335,7 +321,6 @@ val triggers: (serverMessenger: Messenger, incomeMessenger: Messenger) -> PLV2Tr
 ```
 
 #### Post Amount Trigger(T1)
-
 ```kotlin
 override fun postAmountEntered(amount: String) {
     if (amount.isNotEmpty()) {
@@ -352,7 +337,6 @@ override fun postAmountEntered(amount: String) {
 ```
 
 #### Post Card Present Trigger(T2)
-
 ```kotlin
  override fun postCardPresented(amount: String, cardToken: String, cardType: String?) {
     if (amount.isNotEmpty() && cardToken.isNotEmpty()) {
@@ -369,7 +353,6 @@ override fun postAmountEntered(amount: String) {
 ```
 
 #### Post Transaction Trigger(T3)
-
 ```kotlin
  override fun postTransaction(
     amount: String,
@@ -461,6 +444,6 @@ fun openPLMApp(
 
 Refer to [ServiceBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/ServiceBasedIntegrationActivity.kt)
 
-### See [plSDK](https://github.com/koti-pl/PLSample/tree/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK) package for more details about triggers
+### See [plSDK](https://github.com/koti-pl/PLSample/tree/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK) package for more implementation details about triggers
 
 
