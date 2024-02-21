@@ -48,13 +48,13 @@ git clone https://github.com/koti-pl/PLSample.git
    reliable post-transaction process, enhancing user satisfaction and operational efficiency.    
 
 
-## howToSendTrigger
+## How To Send Trigger
 
 We can send Triggers by using 
 1. [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts)
 2. [Service and Messenger](https://developer.android.com/develop/background-work/services/bound-services)
 
-# [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts) : Use the following code snippets to send T1,T2 and T3 triggers
+### [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts) : Use the following code snippets to send T1,T2 and T3 triggers
 
 i. Post Amount Trigger(T1)
 ```sh
