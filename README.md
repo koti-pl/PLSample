@@ -380,7 +380,7 @@ override fun postAmountEntered(amount: String) {
 }
 ```
 ### How to launch the PLM
-When the payment app receives the trigger status <span id="copyable-word">OPEN_APP = 6</span> then launch the activity using the following code. You will receive the result as 'OK' if there is any reward available.
+When the payment app receives the trigger status as [6] then launch the activity using the following code. You will receive the result as 'OK' if there is any reward available.
 
 ##### Launching PLM
 ```kotlin
