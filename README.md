@@ -18,10 +18,7 @@ for customers based on their payment transactions my mocking the data.
 - Demonstrate usage triggers using the broadcast intents
 - Demonstrate usage triggers using the service
 #### Sample Video
-<video width="220" height="420" controls autoplay>
-  <source src="docs/sample_flow.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[![Sample App](docs/app_screen.png)](docs/sample_flow.mp4)
 
 ## Installation
 Clone the repository:
