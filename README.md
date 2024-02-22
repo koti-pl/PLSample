@@ -18,7 +18,10 @@ for customers based on their payment transactions my mocking the data.
 - Demonstrate usage triggers using the broadcast intents
 - Demonstrate usage triggers using the service
 #### Sample Video (https://github.com/koti-pl/PLSample/blob/master/docs/sample_flow.mp4)
-[<img src="docs/app_screen.png" width="50%">](https://github.com/koti-pl/PLSample/blob/master/docs/sample_flow.mp4 "Watch")
+
+         Start         |     Service Based      |    Broadcast Based     |
+
+<img src="docs/app_screen.png.png " width="180" height="380" /> <img src="docs/service_based.png.png " width="180" height="380" /> <img src="docs/broadcast_based.png.png " width="180" height="380" />
 
 ## Installation
 Clone the repository:
