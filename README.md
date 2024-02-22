@@ -21,7 +21,7 @@ for customers based on their payment transactions my mocking the data.
 
          Start         |     Service Based      |    Broadcast Based     |
 
-<img src="docs/app_screen.png.png " width="180" height="380" /> <img src="docs/service_based.png.png " width="180" height="380" /> <img src="docs/broadcast_based.png.png " width="180" height="380" />
+<img src="docs/app_screen.png " width="180" height="380" /> <img src="docs/service_based.png " width="180" height="380" /> <img src="docs/broadcast_based.png " width="180" height="380" />
 
 ## Installation
 Clone the repository:
