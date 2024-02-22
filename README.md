@@ -11,6 +11,7 @@ for customers based on their payment transactions my mocking the data.
 - [Installation](#installation)
 - [Triggers](#triggers)
 - [How To Send Trigger](#howToSendTrigger)
+- [Notes](#notes)
 
 ## Features
 
@@ -219,9 +220,12 @@ override fun onDestroy() {
 
 ### [Service and Messenger](https://developer.android.com/develop/background-work/services/bound-services) : Use the following code snippets to send T1,T2 and T3 triggers by using service and messenger
 
-Start the service before initiating any transaction. It's not mandatory to start the service with
-every transaction if it's already started and the service connection is available. However, to send
-and receive triggers to PLM, it is mandatory to be connected to the service.
+Due to various limitations with broadcasts starting from Android 8, we have introduced a new
+communication channel using services for more effective app-to-app communication.
+
+Start the service before initiating any transaction. It is not necessary to start the service with
+every transaction if it is already running and the service connection is available. However, to send
+and receive triggers to PLM, it is mandatory to have an active connection to the service.
 
 #### Start service
 
@@ -454,4 +458,9 @@ Refer to [ServiceBasedIntegrationActivity](https://github.com/koti-pl/PLSample/b
 
 ### See [plSDK](https://github.com/koti-pl/PLSample/tree/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK) package for more implementation details about triggers
 
-
+## notes
+1. The CardToken must not be an actual card number. It should instead be a unique and repeatable identifier assigned to each card to identify and access specific card or user-related loyalty points.
+2. On the Post Card trigger (T2), if PLM returns any discounts, the Payment app should request card authentication again with the adjusted amount. However, there's no need to resend the post card trigger (T2) during the second card authentication. Instead, we always anticipate the post-transaction trigger (T3) following the post card trigger (T2).    
+3. Ensure that there is always one active campaign synced on the terminal to run any loyalty program. If there are no active campaigns, PLM will be in an inactive state with no campaign running.  
+4. To start using triggers, Make sure you have added the permission <uses-permission android:name="co.paymentLoyalty.permission.TRIGGER" />  
+5. Make sure the service connection is established before sending any triggers with service based approach.
