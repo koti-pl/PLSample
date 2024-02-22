@@ -18,7 +18,7 @@ for customers based on their payment transactions my mocking the data.
 - Demonstrate usage triggers using the broadcast intents
 - Demonstrate usage triggers using the service
 #### Sample Video
-[![Sample App](docs/app_screen.png)](docs/sample_flow.mp4)
+[<img src="docs/app_screen.png" width="50%">](docs/app_screen.png "Watch")
 
 ## Installation
 Clone the repository:
