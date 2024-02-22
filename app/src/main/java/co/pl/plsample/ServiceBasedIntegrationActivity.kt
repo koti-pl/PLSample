@@ -138,6 +138,7 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
         if (isPLMInstalled(packageManager)) {
             val intent = Intent(PLIntentsFilters.TRIGGER_ACTION)
             intent.setPackage(PLIntentsFilters.APP_ID)
+            intent.addCategory(PLIntentsFilters.TRIGGER_INTENT_CATEGORY)
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         } else {
             showError("PLM Not available")

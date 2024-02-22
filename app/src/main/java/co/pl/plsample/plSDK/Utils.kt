@@ -13,6 +13,7 @@ object PLIntentsFilters{
 
     //Payment loyalty trigger Action [works for both broadcast and service]
     val TRIGGER_ACTION = "co.paymentLoyalty.action.trigger"
+    val TRIGGER_INTENT_CATEGORY = "co.paymentLoyalty.category.TRIGGER"
 
     //intent filter to send intents to loyalty application [Deprecated only works with broadcast]
     const val PL_TRIGGER_INTENT_ACTION = "com.nominateloyalty.confirm"

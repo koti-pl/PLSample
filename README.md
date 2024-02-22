@@ -224,6 +224,13 @@ every transaction if it's already started and the service connection is availabl
 and receive triggers to PLM, it is mandatory to be connected to the service.
 
 #### Start service
+
+##### Begin with by adding the trigger permissions into project manifest 
+
+```xml
+<uses-permission android:name="co.paymentLoyalty.permission.TRIGGER" />
+```
+
 ```kotlin
 private var serverMessenger: Messenger? = null
 private val serviceConnection = object : ServiceConnection {
@@ -248,13 +255,14 @@ private val serviceConnection = object : ServiceConnection {
 }
 
 private fun startService() {
-    if (isPLMInstalled(packageManager)) {
-        val intent = Intent(PLIntentsFilters.TRIGGER_ACTION)
-        intent.setPackage(PLIntentsFilters.APP_ID)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-    } else {
-        showError("PLM Not available")
-    }
+   if (isPLMInstalled(packageManager)) {
+      val intent = Intent(PLIntentsFilters.TRIGGER_ACTION)
+      intent.setPackage(PLIntentsFilters.APP_ID)
+      intent.addCategory(PLIntentsFilters.TRIGGER_INTENT_CATEGORY)
+      bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+   } else {
+      showError("PLM Not available")
+   }
 }
 ```
 #### Stop service
