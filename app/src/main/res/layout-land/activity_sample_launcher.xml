@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A8FD0"
+    android:padding="@dimen/spaceMedium"
+    tools:context=".SampleLauncherActivity">
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/terminateApp"
+        android:layout_width="@dimen/form_element_height"
+        android:layout_height="@dimen/form_element_height"
+        android:background="@drawable/ic_stop_button_bg"
+        android:src="@drawable/ic_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/serviceBased"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_button_bg"
+        android:padding="@dimen/spaceMedium"
+        android:text="@string/service_based_approach"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/broadcastBased"
+        app:layout_constraintEnd_toEndOf="@+id/broadcastBased"
+        app:layout_constraintStart_toStartOf="@+id/broadcastBased"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/broadcastBased"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_button_bg"
+        android:padding="@dimen/spaceMedium"
+        android:text="@string/broadcast_based_approach"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/serviceBased" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

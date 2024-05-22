@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A8FD0"
+    android:padding="@dimen/spaceMedium"
+    tools:context=".BaseActivity">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/form_element_height"
+        android:gravity="center_vertical"
+        android:text="@string/transaction_screen"
+        android:textColor="@color/white"
+        android:textSize="@dimen/page_title"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/terminateApp"
+        android:layout_width="@dimen/form_element_height"
+        android:layout_height="@dimen/form_element_height"
+        android:background="@drawable/ic_stop_button_bg"
+        android:src="@drawable/ic_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etAmount"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/form_element_height"
+        android:layout_marginTop="@dimen/spaceSmall"
+        android:background="@color/white"
+        android:hint="@string/enter_amount"
+        android:imeOptions="actionDone"
+        android:inputType="number"
+        android:maxLength="10"
+        android:maxLines="1"
+        android:paddingStart="@dimen/spaceMedium"
+        android:textColor="@color/font_amount_color"
+        android:textSize="@dimen/form_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@id/verticalDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etCardToken"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/form_element_height"
+        android:layout_marginTop="@dimen/spaceSmall"
+        android:background="@color/white"
+        android:hint="@string/enter_card_token"
+        android:imeOptions="actionDone"
+        android:maxLines="1"
+        android:paddingStart="@dimen/spaceMedium"
+        android:textColor="@color/font_amount_color"
+        android:textSize="@dimen/form_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@id/verticalDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etAmount" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/startTransaction"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/form_element_height"
+        android:layout_marginTop="@dimen/spaceSmall"
+        android:layout_marginEnd="@dimen/spaceXSmall"
+        android:background="@drawable/ic_start_button_bg"
+        android:text="@string/start_transaction"
+        android:textColor="@color/white"
+        android:textSize="@dimen/controlls_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/stopTransaction"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etCardToken" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/stopTransaction"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/form_element_height"
+        android:layout_marginStart="@dimen/spaceXSmall"
+        android:layout_marginTop="@dimen/spaceSmall"
+        android:background="@drawable/ic_stop_button_bg"
+        android:text="@string/stop_transaction"
+        android:textColor="@color/white"
+        android:textSize="@dimen/controlls_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@id/verticalDivider"
+        app:layout_constraintStart_toEndOf="@+id/startTransaction"
+        app:layout_constraintTop_toBottomOf="@+id/etCardToken" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/verticalDivider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/transactionControls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="startTransaction,stopTransaction"
+        app:layout_constraintStart_toEndOf="@+id/verticalDivider" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/postAmount"
+        android:layout_width="@dimen/dimenTriggerSize"
+        android:layout_height="@dimen/form_element_height"
+        android:layout_marginTop="@dimen/spaceMedium"
+        android:background="@drawable/ic_button_bg"
+        android:text="@string/post_amount"
+        android:textColor="@color/black"
+        android:textSize="@dimen/controlls_text_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/postcard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/verticalDivider"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/postcard"
+        android:layout_width="@dimen/dimenTriggerSize"
+        android:layout_height="@dimen/form_element_height"
+        android:layout_marginTop="@dimen/spaceXSmall"
+        android:background="@drawable/ic_button_bg"
+        android:text="@string/post_card"
+        android:textColor="@color/black"
+        android:textSize="@dimen/controlls_text_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/postTransactions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/verticalDivider"
+        app:layout_constraintTop_toBottomOf="@+id/postAmount"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/postTransactions"
+        android:layout_width="@dimen/dimenTriggerSize"
+        android:layout_height="@dimen/form_element_height"
+        android:layout_marginTop="@dimen/spaceXSmall"
+        android:background="@drawable/ic_button_bg"
+        android:text="@string/post_transaction"
+        android:textColor="@color/black"
+        android:textSize="@dimen/controlls_text_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/resetData"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/verticalDivider"
+        app:layout_constraintTop_toBottomOf="@+id/postcard"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/resetData"
+        android:layout_width="@dimen/dimenTriggerSize"
+        android:layout_height="@dimen/form_element_height"
+        android:layout_marginTop="@dimen/spaceXSmall"
+        android:background="@drawable/ic_button_bg"
+        android:text="@string/reset_data"
+        android:textColor="@color/black"
+        android:textSize="@dimen/controlls_text_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/verticalDivider"
+        app:layout_constraintTop_toBottomOf="@+id/postTransactions"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvResponse"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/spaceMedium"
+        android:background="@color/white"
+        android:hint="@string/trigger_status_will_be_updated_here"
+        android:padding="@dimen/spaceXSmall"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/verticalDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stopTransaction" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
