@@ -8,5 +8,6 @@ package co.pl.plsample.plSDK
 data class PLTriggerResponse(
     val status : Int,
     val discount:String?,
-    val message:String?
+    val message:String?,
+    val couponBase64:String? = null
 )

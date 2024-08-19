@@ -65,6 +65,7 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
             } ?: run {
                 showError(ERROR_SERVICE_NOT_AVAILABLE)
             }
+            couponView.setImageBitmap(null)
         } else {
             showError("Enter valid amount to continue!")
         }
@@ -137,8 +138,8 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
     private fun startService() {
         if (isPLMInstalled(packageManager)) {
             val intent = Intent(PLIntentsFilters.TRIGGER_ACTION)
-            intent.setPackage(PLIntentsFilters.APP_ID)
-            intent.addCategory(PLIntentsFilters.TRIGGER_INTENT_CATEGORY)
+            intent.setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
+            intent.addCategory(PLIntentsFilters.INTENT_CATEGORY_TRIGGER)
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         } else {
             showError("PLM Not available")
