@@ -69,29 +69,34 @@ We can send Triggers by using
  * Posts the entered amount information to the Payment Loyalty Module (PLM) app if installed on the device.
  *
  * @param amount The amount entered by the user.
+ * @param shareCouponBitmap to enable receiving the generated coupon as bitmap. Default value is true.
  * @return Boolean indicating whether the entered amount information was successfully posted to the PLM app.
  */
 fun Context.sendPostAmountEntered(
-    amount: String
+   amount: String,
+   shareCouponBitmap: Boolean = true
 ): Boolean {
-    // Check if the PLM app is installed on the device
-    return if (isPLMInstalled(packageManager)) {
-        // Create an intent to trigger the PLM app with the entered amount details
-        val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
-            putExtra(PLIntentParamKey.AMOUNT, amount)
-            putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_AMOUNT_ENTRY)
-            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES) // Ensure the intent is delivered to the PLM app
-        }
+   // Check if the PLM app is installed on the device
+   return if (isPLMInstalled(packageManager)) {
+      // Create an intent to trigger the PLM app with the entered amount details
+      val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
+         setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
+         putExtra(PLIntentParamKey.APP_IDENTIFIER,BuildConfig.APPLICATION_ID)
+         putExtra(PLIntentParamKey.COUPON_SHARING_ENABLED,shareCouponBitmap)
+         putExtra(PLIntentParamKey.AMOUNT, amount)
+         putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_AMOUNT_ENTRY)
+         addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES) // Ensure the intent is delivered to the PLM app
+      }
 
-        // Send a broadcast to the PLM app with the entered amount details
-        sendBroadcast(intent)
+      // Send a broadcast to the PLM app with the entered amount details
+      sendBroadcast(intent)
 
-        // Return true indicating successful posting of entered amount information
-        true
-    } else {
-        // Continue with the payment if the PLM app is not installed
-        false
-    }
+      // Return true indicating successful posting of entered amount information
+      true
+   } else {
+      // Continue with the payment if the PLM app is not installed
+      false
+   }
 }
 ```
 #### Post Card Present Trigger(T2)
@@ -105,30 +110,32 @@ fun Context.sendPostAmountEntered(
  * @return Boolean indicating whether the card presentation event was successfully posted to the PLM app.
  */
 fun Context.sendPostCardPresent(
-    cardToken: String,
-    cardType: String? = null,
-    amount: String
+   cardToken: String,
+   cardType: String? = null,
+   amount: String
 ): Boolean {
-    // Check if the PLM app is installed on the device
-    return if (isPLMInstalled(packageManager)) {
-        // Create an intent to trigger the PLM app with card presentation details
-        val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
-            putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
-            putExtra(V2Trigger.Params.CARD_TYPE, cardType)
-            putExtra(PLIntentParamKey.AMOUNT, amount)
-            putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_CARD_PRESENTED)
-            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-        }
+   // Check if the PLM app is installed on the device
+   return if (isPLMInstalled(packageManager)) {
+      // Create an intent to trigger the PLM app with card presentation details
+      val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
+         setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
+         putExtra(PLIntentParamKey.APP_IDENTIFIER,BuildConfig.APPLICATION_ID)
+         putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
+         putExtra(V2Trigger.Params.CARD_TYPE, cardType) //Optional
+         putExtra(PLIntentParamKey.AMOUNT, amount)
+         putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_CARD_PRESENTED)
+         addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+      }
 
-        // Send a broadcast to the PLM app with the card presentation details
-        sendBroadcast(intent)
+      // Send a broadcast to the PLM app with the card presentation details
+      sendBroadcast(intent)
 
-        // Return true indicating successful card presentation posting
-        true
-    } else {
-        // Return false if the PLM app is not installed
-        false
-    }
+      // Return true indicating successful card presentation posting
+      true
+   } else {
+      // Return false if the PLM app is not installed
+      false
+   }
 }
 ```
 #### Post Transaction Trigger(T3)
@@ -144,27 +151,29 @@ fun Context.sendPostCardPresent(
  * @return Boolean indicating whether the transaction was successfully posted to the PLM app.
  */
 fun Context.sendPostTransaction(
-    cardToken: String,
-    cardType: String? = null,
-    amount: String,
-    transactionId: String? = null,
-    transactionStatus: Boolean
+   cardToken: String,
+   cardType: String? = null,
+   amount: String,
+   transactionId: String? = null,
+   transactionStatus: Boolean
 ): Boolean {
-    return if (isPLMInstalled(packageManager)) {
-        val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
-            putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
-            putExtra(V2Trigger.Params.CARD_TYPE, cardType)
-            putExtra(PLIntentParamKey.AMOUNT, amount)
-            putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_TRANSACTION)
-            putExtra(V2Trigger.Params.TRANSACTION_STATUS, transactionStatus)
-            putExtra(V2Trigger.Params.TRANSACTION_ID, transactionId)
-            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-        }
-        sendBroadcast(intent)
-        true
-    } else { //If plm app not installed
-        false
-    }
+   return if (isPLMInstalled(packageManager)) {
+      val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
+         setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
+         putExtra(PLIntentParamKey.APP_IDENTIFIER,BuildConfig.APPLICATION_ID)
+         putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
+         putExtra(V2Trigger.Params.CARD_TYPE, cardType) //Optional
+         putExtra(PLIntentParamKey.AMOUNT, amount)
+         putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_TRANSACTION)
+         putExtra(V2Trigger.Params.TRANSACTION_STATUS, transactionStatus) //Optional
+         putExtra(V2Trigger.Params.TRANSACTION_ID, transactionId) //Optional
+         addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+      }
+      sendBroadcast(intent)
+      true
+   } else { //If plm app not installed
+      false
+   }
 }
 ```
 
@@ -326,7 +335,7 @@ private fun startService() {
 }
 ```
 
-Refer to [BroadcastBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/BroadcastBasedIntegrationActivity.kt) for more implementation details
+Refer to [BroadcastBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/BroadcastBasedIntegrationActivity.kt) and [BaseActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/BaseActivity.kt) for more implementation details
 
 #### To send and triggers need to create a object of PLV2Triggers. [PLV2Triggers](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK/PLV2Triggers.kt) has all required trigger implementation. Simply copy to you project source and create object as shown
 
@@ -335,6 +344,88 @@ val triggers: (serverMessenger: Messenger, incomeMessenger: Messenger) -> PLV2Tr
     { serverMessenger, incomeMessenger ->
         PLV2Triggers(serverMessenger, incomeMessenger)
     }
+```
+
+#### Create PLV2Triggers
+```kotlin
+ class PLV2Triggers(
+   private val serviceMessenger: Messenger,
+   private val clientMessenger: Messenger,
+) {
+   fun sendPostAmount(
+      amount: String,
+      enableCouponSharing: Boolean = true
+   ) {
+      val data = bundleOf(
+         V2Trigger.Params.AMOUNT to amount,
+         V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
+         V2Trigger.Params.COUPON_SHARING_ENABLED to enableCouponSharing,
+      )
+      sendTrigger(V2Trigger.POST_AMOUNT, data)
+   }
+
+   /**
+    * Posts information about a card presentation event to the Payment Loyalty Module (PLM) app if installed on the device.
+    *
+    * @param cardToken The token representing the user's card information.
+    * @param cardType The type of the (ex: Visa)
+    * @param amount The amount associated with the card presentation event.
+    */
+   fun sendPostCard(amount: String, cardToken: String, cardType: String) {
+      val data = bundleOf(
+         V2Trigger.Params.AMOUNT to amount,
+         V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
+         V2Trigger.Params.CARD_TOKEN to cardToken,
+         V2Trigger.Params.CARD_TYPE to cardType
+      )
+      sendTrigger(V2Trigger.POST_CARD_PRESENT, data)
+   }
+
+   /**
+    * Posts a transaction to the Payment Loyalty Module (PLM) app if installed on the device.
+    *
+    * @param cardToken The token representing the user's card information.
+    * @param cardType The type of the (ex: visa)
+    * @param amount The amount associated with the transaction.
+    * @param transactionId The current transaction id.
+    * @param transactionStatus The current transaction status. If transaction is success then it is true otherwise false
+    */
+   fun sendPostTransaction(
+      amount: String,
+      cardToken: String,
+      cardType: String? = null,
+      transactionId: String? = null,
+      transactionStatus: Boolean
+   ) {
+      val data = bundleOf(
+         V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
+         V2Trigger.Params.AMOUNT to amount,
+         V2Trigger.Params.CARD_TOKEN to cardToken,
+         V2Trigger.Params.CARD_TYPE to cardType,
+         V2Trigger.Params.TRANSACTION_STATUS to transactionStatus,
+         V2Trigger.Params.TRANSACTION_ID to transactionId
+      )
+      sendTrigger(V2Trigger.POST_TRANSACTION, data)
+   }
+
+
+   private fun sendTrigger(
+      trigger: Int,
+      bundle: Bundle
+   ) {
+      try {
+         val msg = Message.obtain(null, trigger).apply {
+            data = bundle
+            replyTo = clientMessenger
+         }
+         serviceMessenger.send(msg)
+         Log.i("Trigger", "SENT $trigger with data $bundle")
+      } catch (e: RemoteException) {
+         e.printStackTrace()
+      }
+   }
+
+}
 ```
 
 #### Post Amount Trigger(T1)
@@ -402,30 +493,87 @@ When the payment app receives the trigger status as [6] then launch the activity
 ##### Launching PLM
 ```kotlin
 /** activity launcher*/
-    var activityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.let {
-                    val status = it.getIntExtra(PLIntentParamKey.STATUS, 0)
-                    if (status == PLStatus.REWARD) {
-                        val discountAmount = (it.getStringExtra(PLIntentParamKey.DISCOUNT)?: "0").trim()
-                        adjustTheAmount(discountAmount)
-                    } else {
-                        Log.e(TAG, "continue payment==>")
-                        // Process with actual amount (no reward)
-                        // You might want to include your actual amount processing logic here
-                    }
+var activityResultLauncher =
+   registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+      if (result.resultCode == Activity.RESULT_OK) {
+         if(!rewardBroadcastRegistered) {
+            result.data?.let {
+               //If we receive coupon base64 string then start print job
+               val couponBase64 = it.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+               printTheCoupon(couponBase64)
 
-                } ?: run {
-                    Log.e(TAG, "continue payment==>")
-                    // Process with actual amount (no reward)
-                    // You might want to include your actual amount processing logic here
-                }
+               val status = it.getIntExtra(PLIntentParamKey.STATUS, 0)
+               if (status == PLStatus.REWARD) {
+                  val discountAmount =
+                     (it.getStringExtra(PLIntentParamKey.DISCOUNT) ?: "0").trim()
+                  adjustTheAmount(discountAmount)
+               } else {
+                  Log.e(TAG, "continue payment==>")
+                  // Process with actual amount (no reward)
+                  // You might want to include your actual amount processing logic here
+               }
 
-            } else {
-                // handle error state
+            } ?: run {
+               Log.e(TAG, "continue payment==>")
+               // Process with actual amount (no reward)
+               // You might want to include your actual amount processing logic here
             }
-        }
+         }
+
+      } else {
+         result.data?.let {
+            //If we receive coupon base64 string then start print job
+            val couponBase64 = it.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+            printTheCoupon(couponBase64)
+         }
+         Log.e(TAG, "result not ok continue payment==>")
+         // handle error state
+      }
+   }
+
+/** We also deliver launch result on broadcast, We can use either of one based on application needs */
+private val rewardReceiver = object : BroadcastReceiver() {
+   override fun onReceive(context: Context, intent: Intent) {
+      val status = intent.getIntExtra(PLIntentParamKey.STATUS, PLStatus.NO_ACTION_NEEDED)
+      //If we receive coupon base64 string then start print job
+      val couponBase64 = intent.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+      printTheCoupon(couponBase64)
+      if (status == PLStatus.REWARD) {
+         val transactionAmount = intent.getStringExtra(PLIntentParamKey.AMOUNT)
+         val discount = intent.getStringExtra(PLIntentParamKey.DISCOUNT) ?: "0"
+         Log.d(TAG, "reward details :: $transactionAmount")
+         Log.d(TAG, "reward details :: $discount")
+         Log.d(TAG, "reward details :: $status")
+         val result = PLTriggerResponse(
+            status = status,
+            discount = discount,
+            couponBase64 = couponBase64,
+            message = "Result"
+         )
+         Log.e(TAG, "Receiver reward processing")
+         adjustTheAmount(discount)
+      } else {
+         Log.e(TAG, "Receiver no reward processing")
+      }
+   }
+}
+
+/*Register receiver*/
+override fun onResume() {
+   super.onResume()
+   val filter = IntentFilter().apply {
+      addAction(PLIntentsFilters.PL_FLOW_REWARD_ACTION)
+   }
+   registerReceiver(rewardReceiver, filter)
+   rewardBroadcastRegistered = true
+}
+
+/*Unregister receiver*/
+override fun onStop() {
+   super.onStop()
+   unregisterReceiver(rewardReceiver)
+   rewardBroadcastRegistered = false
+}
 
 /**
  * Opens the Payment Loyalty Module (PLM) app with specified parameters.
@@ -445,6 +593,7 @@ fun openPLMApp(
    try {
       val intent = Intent(PLIntentsFilters.OPEN_PLM_ACTION).apply {
          flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+         setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
          putExtra(PLIntentParamKey.AMOUNT, amount)
          putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
          putExtra(PLIntentParamKey.LAUNCH_FROM, launchFrom)
@@ -459,7 +608,7 @@ fun openPLMApp(
 
 ```
 
-Refer to [ServiceBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/ServiceBasedIntegrationActivity.kt)
+Refer to [ServiceBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/ServiceBasedIntegrationActivity.kt) and [BaseActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/BaseActivity.kt) for more implementation details
 
 ### See [plSDK](https://github.com/koti-pl/PLSample/tree/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK) package for more implementation details about triggers
 

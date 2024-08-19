@@ -6,6 +6,7 @@ import android.os.Messenger
 import android.os.RemoteException
 import android.util.Log
 import androidx.core.os.bundleOf
+import co.pl.plsample.BuildConfig
 
 /**
  * @file PLTrigger
@@ -13,12 +14,17 @@ import androidx.core.os.bundleOf
  * Description: Helper class to send triggers to Payment Loyalty
  */
 class PLV2Triggers(
-    val serviceMessenger: Messenger,
-    val clientMessenger: Messenger,
+    private val serviceMessenger: Messenger,
+    private val clientMessenger: Messenger,
 ) {
-    fun sendPostAmount(amount: String) {
+    fun sendPostAmount(
+        amount: String,
+        enableCouponSharing: Boolean = true
+    ) {
         val data = bundleOf(
             V2Trigger.Params.AMOUNT to amount,
+            V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
+            V2Trigger.Params.COUPON_SHARING_ENABLED to enableCouponSharing,
         )
         sendTrigger(V2Trigger.POST_AMOUNT, data)
     }
@@ -33,6 +39,7 @@ class PLV2Triggers(
     fun sendPostCard(amount: String, cardToken: String, cardType: String) {
         val data = bundleOf(
             V2Trigger.Params.AMOUNT to amount,
+            V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
             V2Trigger.Params.CARD_TOKEN to cardToken,
             V2Trigger.Params.CARD_TYPE to cardType
         )
@@ -51,11 +58,12 @@ class PLV2Triggers(
     fun sendPostTransaction(
         amount: String,
         cardToken: String,
-        cardType: String?=null,
+        cardType: String? = null,
         transactionId: String? = null,
         transactionStatus: Boolean
     ) {
         val data = bundleOf(
+            V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
             V2Trigger.Params.AMOUNT to amount,
             V2Trigger.Params.CARD_TOKEN to cardToken,
             V2Trigger.Params.CARD_TYPE to cardType,
@@ -76,7 +84,7 @@ class PLV2Triggers(
                 replyTo = clientMessenger
             }
             serviceMessenger.send(msg)
-            Log.i("Trigger", "SENT $trigger with data ${bundle}")
+            Log.i("Trigger", "SENT $trigger with data $bundle")
         } catch (e: RemoteException) {
             e.printStackTrace()
         }

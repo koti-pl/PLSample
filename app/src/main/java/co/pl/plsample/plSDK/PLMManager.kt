@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResultLauncher
+import co.pl.plsample.BuildConfig
 
 /**
  * @file PLMManager
@@ -16,15 +17,20 @@ import androidx.activity.result.ActivityResultLauncher
  * Posts the entered amount information to the Payment Loyalty Module (PLM) app if installed on the device.
  *
  * @param amount The amount entered by the user.
+ * @param shareCouponBitmap to enable receiving the generated coupon as bitmap to print using the printer or to show on screen. Default value is true.
  * @return Boolean indicating whether the entered amount information was successfully posted to the PLM app.
  */
 fun Context.sendPostAmountEntered(
-    amount: String
+    amount: String,
+    shareCouponBitmap: Boolean = true
 ): Boolean {
     // Check if the PLM app is installed on the device
     return if (isPLMInstalled(packageManager)) {
         // Create an intent to trigger the PLM app with the entered amount details
         val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
+            setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
+            putExtra(PLIntentParamKey.APP_IDENTIFIER, BuildConfig.APPLICATION_ID)
+            putExtra(PLIntentParamKey.COUPON_SHARING_ENABLED,shareCouponBitmap)
             putExtra(PLIntentParamKey.AMOUNT, amount)
             putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_AMOUNT_ENTRY)
             addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES) // Ensure the intent is delivered to the PLM app
@@ -59,6 +65,8 @@ fun Context.sendPostCardPresent(
     return if (isPLMInstalled(packageManager)) {
         // Create an intent to trigger the PLM app with card presentation details
         val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
+            setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
+            putExtra(PLIntentParamKey.APP_IDENTIFIER,BuildConfig.APPLICATION_ID)
             putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
             putExtra(V2Trigger.Params.CARD_TYPE, cardType)
             putExtra(PLIntentParamKey.AMOUNT, amount)
@@ -97,6 +105,8 @@ fun Context.sendPostTransaction(
 ): Boolean {
     return if (isPLMInstalled(packageManager)) {
         val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
+            setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
+            putExtra(PLIntentParamKey.APP_IDENTIFIER,BuildConfig.APPLICATION_ID)
             putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
             putExtra(V2Trigger.Params.CARD_TYPE, cardType)
             putExtra(PLIntentParamKey.AMOUNT, amount)
@@ -131,6 +141,7 @@ fun openPLMApp(
     try {
         val intent = Intent(PLIntentsFilters.OPEN_PLM_ACTION).apply {
             flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+            setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
             putExtra(PLIntentParamKey.AMOUNT, amount)
             putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
             putExtra(PLIntentParamKey.LAUNCH_FROM, launchFrom)
@@ -151,5 +162,5 @@ fun openPLMApp(
  * @return Boolean indicating whether the PLM app is installed on the device.
  */
 fun isPLMInstalled(packageManager: PackageManager): Boolean {
-    return packageManager.getLaunchIntentForPackage(PLIntentsFilters.APP_ID) != null
+    return packageManager.getLaunchIntentForPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID) != null
 }

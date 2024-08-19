@@ -1,6 +1,9 @@
 package co.pl.plsample
 
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -49,34 +52,74 @@ abstract class BaseActivity : AppCompatActivity() {
     lateinit var btnPostCardPresent: AppCompatButton
     lateinit var btnPostTransaction: AppCompatButton
 
+    private var rewardBroadcastRegistered = false
+    private val rewardReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val status = intent.getIntExtra(PLIntentParamKey.STATUS, PLStatus.NO_ACTION_NEEDED)
+            //If we receive coupon base64 string then start print job
+            val couponBase64 = intent.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+            printTheCoupon(couponBase64)
+            if (status == PLStatus.REWARD) {
+                val transactionAmount = intent.getStringExtra(PLIntentParamKey.AMOUNT)
+                val discount = intent.getStringExtra(PLIntentParamKey.DISCOUNT) ?: "0"
+                Log.d(TAG, "reward details :: $transactionAmount")
+                Log.d(TAG, "reward details :: $discount")
+                Log.d(TAG, "reward details :: $status")
+                val result = PLTriggerResponse(
+                    status = status,
+                    discount = discount,
+                    couponBase64 = couponBase64,
+                    message = "Result"
+                )
+                Log.e(TAG, "Receiver reward processing")
+                adjustTheAmount(discount)
+            } else {
+                Log.e(TAG, "Receiver no reward processing")
+            }
+        }
+    }
+
 
     /** activity launcher*/
     var activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.let {
-                    val status = it.getIntExtra(PLIntentParamKey.STATUS, 0)
-                    if (status == PLStatus.REWARD) {
-                        val discountAmount = (it.getStringExtra(PLIntentParamKey.DISCOUNT)?: "0").trim()
-                        adjustTheAmount(discountAmount)
-                    } else {
+                if(!rewardBroadcastRegistered) {
+                    result.data?.let {
+                        //If we receive coupon base64 string then start print job
+                        val couponBase64 = it.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+                        printTheCoupon(couponBase64)
+
+                        val status = it.getIntExtra(PLIntentParamKey.STATUS, 0)
+                        if (status == PLStatus.REWARD) {
+                            val discountAmount =
+                                (it.getStringExtra(PLIntentParamKey.DISCOUNT) ?: "0").trim()
+                            adjustTheAmount(discountAmount)
+                        } else {
+                            Log.e(TAG, "continue payment==>")
+                            // Process with actual amount (no reward)
+                            // You might want to include your actual amount processing logic here
+                        }
+
+                    } ?: run {
                         Log.e(TAG, "continue payment==>")
                         // Process with actual amount (no reward)
                         // You might want to include your actual amount processing logic here
                     }
-
-                } ?: run {
-                    Log.e(TAG, "continue payment==>")
-                    // Process with actual amount (no reward)
-                    // You might want to include your actual amount processing logic here
                 }
 
             } else {
+                result.data?.let {
+                    //If we receive coupon base64 string then start print job
+                    val couponBase64 = it.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+                    printTheCoupon(couponBase64)
+                }
+                Log.e(TAG, "result not ok continue payment==>")
                 // handle error state
             }
         }
 
-    fun adjustTheAmount(discountAmount: String){
+    fun adjustTheAmount(discountAmount: String) {
         lifecycleScope.launch {
             val discount = discountAmount.toDouble()
             if (discount > 0) {
@@ -94,7 +137,10 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
         setContentView(R.layout.activity_main)
@@ -129,6 +175,7 @@ abstract class BaseActivity : AppCompatActivity() {
         btnPostCardPresent = findViewById<AppCompatButton>(R.id.postcard).apply {
             setOnClickListener {
                 amount = etAmount.text.toString()
+                cardToken = etCardToken.text.toString()
                 postCardPresented(
                     amount = etAmount.text.toString(),
                     cardToken = etCardToken.text.toString(),
@@ -155,6 +202,24 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * Note : If you want receive the result on broadcast uncomment or us the below code
+     * */
+    /*override fun onResume() {
+        super.onResume()
+        val filter = IntentFilter().apply {
+            addAction(PLIntentsFilters.PL_FLOW_REWARD_ACTION)
+        }
+        registerReceiver(rewardReceiver, filter)
+        rewardBroadcastRegistered = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceiver(rewardReceiver)
+        rewardBroadcastRegistered = false
+    }*/
+
     private fun resetTransaction() {
         activeTrigger = ""
         cardToken = "1234"
@@ -177,6 +242,13 @@ abstract class BaseActivity : AppCompatActivity() {
     fun updateTriggerResponse(response: PLTriggerResponse) {
         lifecycleScope.launch {
             tvTriggerAcknowledgment.text = "Received : ${response}"
+        }
+    }
+
+    internal fun printTheCoupon(couponBase64: String?) {
+        Log.d(TAG, "couponBase64:: $couponBase64")
+        if (!couponBase64.isNullOrEmpty()) {
+           // bitmapState.value = couponBase64
         }
     }
 
