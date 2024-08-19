@@ -231,6 +231,7 @@ override fun onDestroy() {
     unregisterReceiver(statusBroadcastReceiver)
 }
 ```
+Refer to [BroadcastBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/BroadcastBasedIntegrationActivity.kt) and [BaseActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/BaseActivity.kt) for more implementation details
 
 ### [Service and Messenger](https://developer.android.com/develop/background-work/services/bound-services) : Use the following code snippets to send T1,T2 and T3 triggers by using service and messenger
 
@@ -335,8 +336,6 @@ private fun startService() {
 }
 ```
 
-Refer to [BroadcastBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/BroadcastBasedIntegrationActivity.kt) and [BaseActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/BaseActivity.kt) for more implementation details
-
 #### To send and triggers need to create a object of PLV2Triggers. [PLV2Triggers](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK/PLV2Triggers.kt) has all required trigger implementation. Simply copy to you project source and create object as shown
 
 ```kotlin
@@ -344,88 +343,6 @@ val triggers: (serverMessenger: Messenger, incomeMessenger: Messenger) -> PLV2Tr
     { serverMessenger, incomeMessenger ->
         PLV2Triggers(serverMessenger, incomeMessenger)
     }
-```
-
-#### Create PLV2Triggers
-```kotlin
- class PLV2Triggers(
-   private val serviceMessenger: Messenger,
-   private val clientMessenger: Messenger,
-) {
-   fun sendPostAmount(
-      amount: String,
-      enableCouponSharing: Boolean = true
-   ) {
-      val data = bundleOf(
-         V2Trigger.Params.AMOUNT to amount,
-         V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
-         V2Trigger.Params.COUPON_SHARING_ENABLED to enableCouponSharing,
-      )
-      sendTrigger(V2Trigger.POST_AMOUNT, data)
-   }
-
-   /**
-    * Posts information about a card presentation event to the Payment Loyalty Module (PLM) app if installed on the device.
-    *
-    * @param cardToken The token representing the user's card information.
-    * @param cardType The type of the (ex: Visa)
-    * @param amount The amount associated with the card presentation event.
-    */
-   fun sendPostCard(amount: String, cardToken: String, cardType: String) {
-      val data = bundleOf(
-         V2Trigger.Params.AMOUNT to amount,
-         V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
-         V2Trigger.Params.CARD_TOKEN to cardToken,
-         V2Trigger.Params.CARD_TYPE to cardType
-      )
-      sendTrigger(V2Trigger.POST_CARD_PRESENT, data)
-   }
-
-   /**
-    * Posts a transaction to the Payment Loyalty Module (PLM) app if installed on the device.
-    *
-    * @param cardToken The token representing the user's card information.
-    * @param cardType The type of the (ex: visa)
-    * @param amount The amount associated with the transaction.
-    * @param transactionId The current transaction id.
-    * @param transactionStatus The current transaction status. If transaction is success then it is true otherwise false
-    */
-   fun sendPostTransaction(
-      amount: String,
-      cardToken: String,
-      cardType: String? = null,
-      transactionId: String? = null,
-      transactionStatus: Boolean
-   ) {
-      val data = bundleOf(
-         V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
-         V2Trigger.Params.AMOUNT to amount,
-         V2Trigger.Params.CARD_TOKEN to cardToken,
-         V2Trigger.Params.CARD_TYPE to cardType,
-         V2Trigger.Params.TRANSACTION_STATUS to transactionStatus,
-         V2Trigger.Params.TRANSACTION_ID to transactionId
-      )
-      sendTrigger(V2Trigger.POST_TRANSACTION, data)
-   }
-
-
-   private fun sendTrigger(
-      trigger: Int,
-      bundle: Bundle
-   ) {
-      try {
-         val msg = Message.obtain(null, trigger).apply {
-            data = bundle
-            replyTo = clientMessenger
-         }
-         serviceMessenger.send(msg)
-         Log.i("Trigger", "SENT $trigger with data $bundle")
-      } catch (e: RemoteException) {
-         e.printStackTrace()
-      }
-   }
-
-}
 ```
 
 #### Post Amount Trigger(T1)
@@ -531,50 +448,6 @@ var activityResultLauncher =
       }
    }
 
-/** We also deliver launch result on broadcast, We can use either of one based on application needs */
-private val rewardReceiver = object : BroadcastReceiver() {
-   override fun onReceive(context: Context, intent: Intent) {
-      val status = intent.getIntExtra(PLIntentParamKey.STATUS, PLStatus.NO_ACTION_NEEDED)
-      //If we receive coupon base64 string then start print job
-      val couponBase64 = intent.getStringExtra(PLIntentParamKey.COUPON_BASE64)
-      printTheCoupon(couponBase64)
-      if (status == PLStatus.REWARD) {
-         val transactionAmount = intent.getStringExtra(PLIntentParamKey.AMOUNT)
-         val discount = intent.getStringExtra(PLIntentParamKey.DISCOUNT) ?: "0"
-         Log.d(TAG, "reward details :: $transactionAmount")
-         Log.d(TAG, "reward details :: $discount")
-         Log.d(TAG, "reward details :: $status")
-         val result = PLTriggerResponse(
-            status = status,
-            discount = discount,
-            couponBase64 = couponBase64,
-            message = "Result"
-         )
-         Log.e(TAG, "Receiver reward processing")
-         adjustTheAmount(discount)
-      } else {
-         Log.e(TAG, "Receiver no reward processing")
-      }
-   }
-}
-
-/*Register receiver*/
-override fun onResume() {
-   super.onResume()
-   val filter = IntentFilter().apply {
-      addAction(PLIntentsFilters.PL_FLOW_REWARD_ACTION)
-   }
-   registerReceiver(rewardReceiver, filter)
-   rewardBroadcastRegistered = true
-}
-
-/*Unregister receiver*/
-override fun onStop() {
-   super.onStop()
-   unregisterReceiver(rewardReceiver)
-   rewardBroadcastRegistered = false
-}
-
 /**
  * Opens the Payment Loyalty Module (PLM) app with specified parameters.
  *
@@ -604,6 +477,99 @@ fun openPLMApp(
       e.printStackTrace()
    }
    return false
+}
+
+```
+
+### How to receive the result from the PLM
+When the payment app launches the PLM, it processes the data and returns the result to the payment app, including all discounts and other necessary details. If a reward is available, you will receive a result with the status 'OK'.   
+##### Receive the result via activity launcher
+```kotlin
+/** activity launcher*/
+var activityResultLauncher =
+   registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+      if (result.resultCode == Activity.RESULT_OK) {
+         if(!rewardBroadcastRegistered) {
+            result.data?.let {
+               //If we receive coupon base64 string then start print job
+               val couponBase64 = it.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+               printTheCoupon(couponBase64)
+
+               val status = it.getIntExtra(PLIntentParamKey.STATUS, 0)
+               if (status == PLStatus.REWARD) {
+                  val discountAmount =
+                     (it.getStringExtra(PLIntentParamKey.DISCOUNT) ?: "0").trim()
+                  adjustTheAmount(discountAmount)
+               } else {
+                  Log.e(TAG, "continue payment==>")
+                  // Process with actual amount (no reward)
+                  // You might want to include your actual amount processing logic here
+               }
+
+            } ?: run {
+               Log.e(TAG, "continue payment==>")
+               // Process with actual amount (no reward)
+               // You might want to include your actual amount processing logic here
+            }
+         }
+
+      } else {
+         result.data?.let {
+            //If we receive coupon base64 string then start print job
+            val couponBase64 = it.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+            printTheCoupon(couponBase64)
+         }
+         Log.e(TAG, "result not ok continue payment==>")
+         // handle error state
+      }
+   }
+
+```
+
+##### Receive the result via Broadcast intents
+```kotlin
+/** activity launcher*/
+private val rewardReceiver = object : BroadcastReceiver() {
+      override fun onReceive(context: Context, intent: Intent) {
+         val status = intent.getIntExtra(PLIntentParamKey.STATUS, PLStatus.NO_ACTION_NEEDED)
+         //If we receive coupon base64 string then start print job
+         val couponBase64 = intent.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+         printTheCoupon(couponBase64)
+         if (status == PLStatus.REWARD) {
+            val transactionAmount = intent.getStringExtra(PLIntentParamKey.AMOUNT)
+            val discount = intent.getStringExtra(PLIntentParamKey.DISCOUNT) ?: "0"
+            Log.d(TAG, "reward details :: $transactionAmount")
+            Log.d(TAG, "reward details :: $discount")
+            Log.d(TAG, "reward details :: $status")
+            val result = PLTriggerResponse(
+               status = status,
+               discount = discount,
+               couponBase64 = couponBase64,
+               message = "Result"
+            )
+            Log.e(TAG, "Receiver reward processing")
+            adjustTheAmount(discount)
+         } else {
+            Log.e(TAG, "Receiver no reward processing")
+         }
+      }
+   }
+
+/*Register receiver*/
+override fun onResume() {
+   super.onResume()
+   val filter = IntentFilter().apply {
+      addAction(PLIntentsFilters.PL_FLOW_REWARD_ACTION)
+   }
+   registerReceiver(rewardReceiver, filter)
+   rewardBroadcastRegistered = true
+}
+
+/*Unregister receiver*/
+override fun onStop() {
+   super.onStop()
+   unregisterReceiver(rewardReceiver)
+   rewardBroadcastRegistered = false
 }
 
 ```
