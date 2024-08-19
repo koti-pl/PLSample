@@ -65,6 +65,7 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
             } ?: run {
                 showError(ERROR_SERVICE_NOT_AVAILABLE)
             }
+            couponView.setImageBitmap(null)
         } else {
             showError("Enter valid amount to continue!")
         }

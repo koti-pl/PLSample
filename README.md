@@ -19,9 +19,9 @@ for customers based on their payment transactions my mocking the data.
 - Demonstrate usage triggers using the service
 #### Sample Video (https://github.com/koti-pl/PLSample/blob/master/docs/sample_flow.mp4)
 
-         Start         |     Service Based      |    Broadcast Based     |
+         Start         |     Service Based      |    Broadcast Based     |    Coupon Response     |
 
-<img src="docs/app_screen.png " width="180" height="380" /> <img src="docs/service_based.png " width="180" height="380" /> <img src="docs/broadcast_based.png " width="180" height="380" />
+<img src="docs/app_screen.png " width="180" height="380" /> <img src="docs/service_based.png " width="180" height="380" /> <img src="docs/broadcast_based.png " width="180" height="380" /> <img src="docs/trigger_coupon_response.png " width="180" height="380" />
 
 ## Installation
 Clone the repository:
@@ -575,6 +575,163 @@ override fun onStop() {
 ```
 
 Refer to [ServiceBasedIntegrationActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/ServiceBasedIntegrationActivity.kt) and [BaseActivity](https://github.com/koti-pl/PLSample/blob/feature/update_readme/app/src/main/java/co/pl/plsample/BaseActivity.kt) for more implementation details
+
+### How to print coupons
+Based on campaign configurations, we generate different types of coupons. To share these with customers, they need to be printed. Each coupon, along with other relevant data, is sent when the app is launched via activity launcher or broadcast. To enable the coupon sharing feature send coupon sharing flag on post amount trigger(T1) as true as mentioned below 
+
+##### How to enable coupon sharing 
+###### Via BroadcastIntents
+```kotlin
+/**
+ * Posts the entered amount information to the Payment Loyalty Module (PLM) app if installed on the device.
+ *
+ * @param amount The amount entered by the user.
+ * @param shareCouponBitmap to enable receiving the generated coupon as bitmap. Default value is true.
+ * @return Boolean indicating whether the entered amount information was successfully posted to the PLM app.
+ */
+fun Context.sendPostAmountEntered(
+    amount: String,
+    shareCouponBitmap: Boolean = true
+): Boolean {
+    // Check if the PLM app is installed on the device
+    return if (isPLMInstalled(packageManager)) {
+        // Create an intent to trigger the PLM app with the entered amount details
+        val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
+            setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
+            putExtra(PLIntentParamKey.APP_IDENTIFIER,BuildConfig.APPLICATION_ID)
+            putExtra(PLIntentParamKey.COUPON_SHARING_ENABLED,shareCouponBitmap)
+            putExtra(PLIntentParamKey.AMOUNT, amount)
+            putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_AMOUNT_ENTRY)
+            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES) // Ensure the intent is delivered to the PLM app
+        }
+
+        // Send a broadcast to the PLM app with the entered amount details
+        sendBroadcast(intent)
+
+        // Return true indicating successful posting of entered amount information
+        true
+    } else {
+        // Continue with the payment if the PLM app is not installed
+        false
+    }
+}
+```
+
+###### Via BroadcastIntents
+```kotlin
+/**
+ * Posts the entered amount information to the Payment Loyalty Module (PLM) app if installed on the device.
+ *
+ * @param amount The amount entered by the user.
+ * @param shareCouponBitmap to enable receiving the generated coupon as bitmap. Default value is true.
+ * @return Boolean indicating whether the entered amount information was successfully posted to the PLM app.
+ */
+fun Context.sendPostAmountEntered(
+    amount: String,
+    shareCouponBitmap: Boolean = true
+): Boolean {
+    // Check if the PLM app is installed on the device
+    return if (isPLMInstalled(packageManager)) {
+        // Create an intent to trigger the PLM app with the entered amount details
+        val intent = Intent(PLIntentsFilters.TRIGGER_ACTION).apply {
+            setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
+            putExtra(PLIntentParamKey.APP_IDENTIFIER,BuildConfig.APPLICATION_ID)
+            putExtra(PLIntentParamKey.COUPON_SHARING_ENABLED,shareCouponBitmap)
+            putExtra(PLIntentParamKey.AMOUNT, amount)
+            putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_AMOUNT_ENTRY)
+            addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES) // Ensure the intent is delivered to the PLM app
+        }
+
+        // Send a broadcast to the PLM app with the entered amount details
+        sendBroadcast(intent)
+
+        // Return true indicating successful posting of entered amount information
+        true
+    } else {
+        // Continue with the payment if the PLM app is not installed
+        false
+    }
+}
+```
+
+###### Via Service intents
+```kotlin
+/**
+ * Posts the entered amount information to the Payment Loyalty Module (PLM) app if installed on the device.
+ *
+ * @param amount The amount entered by the user.
+ * @param enableCouponSharing to enable receiving the generated coupon as bitmap. Default value is true.
+ */
+fun sendPostAmount(
+   amount: String,
+   enableCouponSharing: Boolean = true
+) {
+   val data = bundleOf(
+      V2Trigger.Params.AMOUNT to amount,
+      V2Trigger.Params.APP_IDENTIFIER to BuildConfig.APPLICATION_ID,
+      V2Trigger.Params.COUPON_SHARING_ENABLED to enableCouponSharing,
+   )
+   sendTrigger(V2Trigger.POST_AMOUNT, data)
+}
+```
+
+
+
+##### Receive the coupon data via activity launcher
+```kotlin
+/** activity launcher*/
+var activityResultLauncher =
+   registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+      //If we receive coupon base64 string then start print job
+      val couponBase64 = result?.data?.getStringExtra(PLIntentParamKey.COUPON_BASE64) ?: ""
+      printTheCoupon(couponBase64)
+         
+   }
+
+```
+
+##### Receive the coupon data via Broadcast Intents
+```kotlin
+/** activity launcher*/
+private val rewardReceiver = object : BroadcastReceiver() {
+      override fun onReceive(context: Context, intent: Intent) {
+         val couponBase64 = intent.getStringExtra(PLIntentParamKey.COUPON_BASE64)
+         printTheCoupon(couponBase64)
+      }
+   }
+
+internal fun printTheCoupon(couponBase64: String?) {
+   Log.d(TAG, "couponBase64 string:: $couponBase64")
+   if (!couponBase64.isNullOrEmpty()) {
+      val decodedBytes = Base64.decode(couponBase64, Base64.DEFAULT)
+      val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+      bitmap?.let {
+         couponView.setImageBitmap(it)
+      }?:{
+         couponView.setImageBitmap(null)
+      }
+   }
+}
+
+/*Register receiver*/
+override fun onResume() {
+   super.onResume()
+   val filter = IntentFilter().apply {
+      addAction(PLIntentsFilters.PL_FLOW_REWARD_ACTION)
+   }
+   registerReceiver(rewardReceiver, filter)
+   rewardBroadcastRegistered = true
+}
+
+/*Unregister receiver*/
+override fun onStop() {
+   super.onStop()
+   unregisterReceiver(rewardReceiver)
+   rewardBroadcastRegistered = false
+}
+
+```
+
 
 ### See [plSDK](https://github.com/koti-pl/PLSample/tree/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK) package for more implementation details about triggers
 

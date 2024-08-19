@@ -41,6 +41,7 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
         if (status) {
             updateTriggerResponse(getBroadCastSuccessResponse("Post amount trigger sent"))
             activeTrigger = PLIntentTrigger.POST_AMOUNT_ENTRY
+            couponView.setImageBitmap(null)
         } else {
             //continue payment
             showError("Fail to send postAmount trigger")

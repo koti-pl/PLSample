@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
@@ -13,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.lifecycleScope
 import co.pl.plsample.plSDK.PLIntentParamKey
@@ -51,6 +54,8 @@ abstract class BaseActivity : AppCompatActivity() {
     lateinit var btnPostAmount: AppCompatButton
     lateinit var btnPostCardPresent: AppCompatButton
     lateinit var btnPostTransaction: AppCompatButton
+
+    lateinit var couponView: AppCompatImageView
 
     private var rewardBroadcastRegistered = false
     private val rewardReceiver = object : BroadcastReceiver() {
@@ -158,6 +163,7 @@ abstract class BaseActivity : AppCompatActivity() {
         tvTriggerAcknowledgment = findViewById(R.id.tvResponse)
 
         etAmount = findViewById(R.id.etAmount)
+        couponView = findViewById(R.id.couponView)
         etCardToken = findViewById<AppCompatEditText>(R.id.etCardToken).apply {
             setText(cardToken)
         }
@@ -248,7 +254,13 @@ abstract class BaseActivity : AppCompatActivity() {
     internal fun printTheCoupon(couponBase64: String?) {
         Log.d(TAG, "couponBase64:: $couponBase64")
         if (!couponBase64.isNullOrEmpty()) {
-           // bitmapState.value = couponBase64
+           val decodedBytes = Base64.decode(couponBase64, Base64.DEFAULT)
+            val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+            bitmap?.let {
+                couponView.setImageBitmap(it)
+            }?:{
+                couponView.setImageBitmap(null)
+            }
         }
     }
 
