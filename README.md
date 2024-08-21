@@ -68,11 +68,9 @@ We can send Triggers by using
 > [!CAUTION]
 > If your application running on android 11 or above please add the following into manifest toa void
 > any unwanted issues
-> ```kotlin
-<queries>
+> ```kotlin <queries>
         <package android:name="com.winloyalty" />
-    </queries>
-```
+    </queries> ```
 
 ### [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts) : Use the following code snippets to send T1,T2 and T3 triggers by using broadcast intents
 
