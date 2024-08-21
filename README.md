@@ -66,12 +66,11 @@ We can send Triggers by using
 2. [Service and Messenger](https://developer.android.com/develop/background-work/services/bound-services)
 
 > [!CAUTION]
-> If your application running on android 11 or above please add the following into manifest toa void
-> any unwanted issues
-> ```kotlin <queries>
-        <package android:name="com.winloyalty" />
-    </queries> ```
-
+> If your application is running on Android 11 or above, please add the following to your AndroidManifest.xml to avoid any unwanted issues: 
+> <queries>
+>        <package android:name="com.winloyalty" />
+>  </queries> 
+ 
 ### [Broadcast intents](https://developer.android.com/develop/background-work/background-tasks/broadcasts) : Use the following code snippets to send T1,T2 and T3 triggers by using broadcast intents
 
 #### Post Amount Trigger(T1)
