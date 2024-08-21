@@ -12,6 +12,7 @@ import android.os.Message
 import android.os.Messenger
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.lifecycleScope
 import co.pl.plsample.plSDK.PLV2Triggers
@@ -35,6 +36,11 @@ class ServiceBasedIntegrationActivity : BaseActivity() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Log.i(TAG, "Service : onServiceConnected")
             serverMessenger = Messenger(service)
+            Toast.makeText(
+                this@ServiceBasedIntegrationActivity,
+                "Service Connected!",
+                Toast.LENGTH_LONG
+            ).show()
             handleVisibility()
             updateTriggerResponse(
                 PLTriggerResponse(

@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="co.paymentLoyalty.permission.TRIGGER" />
+    <queries>
+        <!-- Declare PL app package to whitelist app to query -->
+        <package android:name="com.winloyalty" />
+    </queries>
 
     <application
         android:allowBackup="true"
@@ -16,17 +20,17 @@
         tools:targetApi="31">
         <activity
             android:name=".ServiceBasedIntegrationActivity"
-            android:launchMode="singleTop"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
         <activity
             android:name=".BroadcastBasedIntegrationActivity"
-            android:launchMode="singleTop"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop" />
 
         <activity
             android:name=".SampleLauncherActivity"
-            android:launchMode="singleInstance"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

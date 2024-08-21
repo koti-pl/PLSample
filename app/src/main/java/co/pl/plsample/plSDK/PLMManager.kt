@@ -68,7 +68,7 @@ fun Context.sendPostCardPresent(
             setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
             putExtra(PLIntentParamKey.APP_IDENTIFIER,BuildConfig.APPLICATION_ID)
             putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
-            putExtra(V2Trigger.Params.CARD_TYPE, cardType)
+            putExtra(V2Trigger.Params.CARD_TYPE, cardType) //optional
             putExtra(PLIntentParamKey.AMOUNT, amount)
             putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_CARD_PRESENTED)
             addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
@@ -108,11 +108,11 @@ fun Context.sendPostTransaction(
             setPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID)
             putExtra(PLIntentParamKey.APP_IDENTIFIER,BuildConfig.APPLICATION_ID)
             putExtra(PLIntentParamKey.CARD_TOKEN, cardToken)
-            putExtra(V2Trigger.Params.CARD_TYPE, cardType)
+            putExtra(V2Trigger.Params.CARD_TYPE, cardType) //Optional
             putExtra(PLIntentParamKey.AMOUNT, amount)
             putExtra(PLIntentParamKey.LAUNCH_FROM, PLIntentTrigger.POST_TRANSACTION)
-            putExtra(V2Trigger.Params.TRANSACTION_STATUS, transactionStatus)
-            putExtra(V2Trigger.Params.TRANSACTION_ID, transactionId)
+            putExtra(V2Trigger.Params.TRANSACTION_STATUS, transactionStatus) //Optional
+            putExtra(V2Trigger.Params.TRANSACTION_ID, transactionId) //Optional
             addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
         }
         sendBroadcast(intent)
@@ -161,6 +161,12 @@ fun openPLMApp(
  * @param packageManager The PackageManager instance used to query information about installed packages.
  * @return Boolean indicating whether the PLM app is installed on the device.
  */
+/**
+ * Note : Declare PL app package to whitelist app to query
+ *     <queries>
+ *         <package android:name="com.winloyalty" />
+ *     </queries>
+ * */
 fun isPLMInstalled(packageManager: PackageManager): Boolean {
     return packageManager.getLaunchIntentForPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID) != null
 }

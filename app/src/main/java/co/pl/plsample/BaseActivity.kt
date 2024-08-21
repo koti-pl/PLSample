@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -19,6 +21,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.lifecycleScope
 import co.pl.plsample.plSDK.PLIntentParamKey
+import co.pl.plsample.plSDK.PLIntentsFilters
 import co.pl.plsample.plSDK.PLStatus
 import co.pl.plsample.plSDK.PLTriggerResponse
 import com.google.android.material.snackbar.Snackbar
@@ -60,6 +63,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private var rewardBroadcastRegistered = false
     private val rewardReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
+            Log.i(TAG, "received result on broadcast")
             val status = intent.getIntExtra(PLIntentParamKey.STATUS, PLStatus.NO_ACTION_NEEDED)
             //If we receive coupon base64 string then start print job
             val couponBase64 = intent.getStringExtra(PLIntentParamKey.COUPON_BASE64)
@@ -88,6 +92,7 @@ abstract class BaseActivity : AppCompatActivity() {
     /** activity launcher*/
     var activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            Log.i(TAG, "received result on launcher")
             if (result.resultCode == Activity.RESULT_OK) {
                 if(!rewardBroadcastRegistered) {
                     result.data?.let {
@@ -119,7 +124,7 @@ abstract class BaseActivity : AppCompatActivity() {
                     val couponBase64 = it.getStringExtra(PLIntentParamKey.COUPON_BASE64)
                     printTheCoupon(couponBase64)
                 }
-                Log.e(TAG, "result not ok continue payment==>")
+                Log.e(TAG, "result not ok continue payment==>${result.data}")
                 // handle error state
             }
         }
@@ -216,7 +221,9 @@ abstract class BaseActivity : AppCompatActivity() {
         val filter = IntentFilter().apply {
             addAction(PLIntentsFilters.PL_FLOW_REWARD_ACTION)
         }
-        registerReceiver(rewardReceiver, filter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(rewardReceiver, filter, RECEIVER_EXPORTED)
+        } else registerReceiver(rewardReceiver, filter)
         rewardBroadcastRegistered = true
     }
 
@@ -252,7 +259,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     internal fun printTheCoupon(couponBase64: String?) {
-        Log.d(TAG, "couponBase64:: $couponBase64")
+        Log.d(TAG, "couponBase64 is available:: ${!couponBase64.isNullOrEmpty()}")
         if (!couponBase64.isNullOrEmpty()) {
            val decodedBytes = Base64.decode(couponBase64, Base64.DEFAULT)
             val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
