@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.view.View
 import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.lifecycleScope
@@ -92,7 +93,9 @@ class BroadcastBasedIntegrationActivity : BaseActivity() {
     private fun registerReceiver(){
         val intentFilter = IntentFilter()
         intentFilter.addAction("com.payment.confirm")
-        registerReceiver(statusBroadcastReceiver, intentFilter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(statusBroadcastReceiver, intentFilter, RECEIVER_EXPORTED)
+        } else registerReceiver(statusBroadcastReceiver, intentFilter)
     }
 
 
