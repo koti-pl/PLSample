@@ -784,19 +784,18 @@ override fun onStop() {
 
 ### See [plSDK](https://github.com/koti-pl/PLSample/tree/feature/update_readme/app/src/main/java/co/pl/plsample/plSDK) package for more implementation details about triggers
 
-## notes
-
-1. The CardToken must not be an actual card number. It should instead be a unique and repeatable
-   identifier assigned to each card to identify and access specific card or user-related loyalty
-   points.
-2. On the Post Card trigger (T2), if PLM returns any discounts, the Payment app should request card
-   authentication again with the adjusted amount. However, there's no need to resend the post card
-   trigger (T2) during the second card authentication. Instead, we always anticipate the
-   post-transaction trigger (T3) following the post card trigger (T2).
-3. Ensure that there is always one active campaign synced on the terminal to run any loyalty
-   program. If there are no active campaigns, PLM will be in an inactive state with no campaign
-   running.
-4. To start using triggers, Make sure you have added the permission <uses-permission android:name="
+> [!IMPORTANT]
+> 1. The CardToken must not be an actual card number. It should instead be a unique and repeatable
+     identifier assigned to each card to identify and access specific card or user-related loyalty
+     points.
+> 2. On the Post Card trigger (T2), if PLM returns any discounts, the Payment app should request card
+     authentication again with the adjusted amount. However, there's no need to resend the post card
+     trigger (T2) during the second card authentication. Instead, we always anticipate the
+     post-transaction trigger (T3) following the post card trigger (T2).
+> 3. Ensure that there is always one active campaign synced on the terminal to run any loyalty
+     program. If there are no active campaigns, PLM will be in an inactive state with no campaign
+     running.
+> 4. To start using triggers, Make sure you have added the permission <uses-permission android:name="
    co.paymentLoyalty.permission.TRIGGER" />
-5. Make sure the service connection is established before sending any triggers with service based
+> 5. Make sure the service connection is established before sending any triggers with service based
    approach.
