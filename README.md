@@ -266,13 +266,6 @@ and receive triggers to PLM, it is mandatory to have an active connection to the
 
 #### Start service
 
-##### Begin with by adding the trigger permissions into project manifest
-
-```xml
-
-<uses-permission android:name="co.paymentLoyalty.permission.TRIGGER" />
-```
-
 ```kotlin
 private var serverMessenger: Messenger? = null
 private val serviceConnection = object : ServiceConnection {
@@ -795,7 +788,5 @@ override fun onStop() {
 > 3. Ensure that there is always one active campaign synced on the terminal to run any loyalty
      program. If there are no active campaigns, PLM will be in an inactive state with no campaign
      running.
-> 4. To start using triggers, Make sure you have added the permission <uses-permission android:name="
-   co.paymentLoyalty.permission.TRIGGER" />
-> 5. Make sure the service connection is established before sending any triggers with service based
+> 4. Make sure the service connection is established before sending any triggers with service based
    approach.
