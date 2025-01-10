@@ -9,6 +9,7 @@ package co.pl.plsample.plSDK
 object PLIntentsFilters {
     //payment app package id
     const val PAYMENT_LOYALTY_APP_ID = "com.winloyalty"
+    const val BILLBOARD_APP_ID = "co.pl.billboard"
 
 
     //Payment loyalty trigger Action [works for both broadcast and service]
@@ -24,6 +25,9 @@ object PLIntentsFilters {
 
     //intent filter to open the loyalty app on specified trigger
     const val OPEN_PLM_ACTION = "com.plm.OPEN_APP"
+
+    //intent filter to open the BillBoard app on specified trigger
+    const val OPEN_BILLBOARD_ACTION = "co.pl.billboard.LAUNCH"
 
     //Payment loyalty broadcast status(PLStatus) of loyalty execution
     const val PL_CONFIRMATION_ACTION = "com.payment.confirm"

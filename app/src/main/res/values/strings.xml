@@ -12,4 +12,5 @@
     <string name="reset_data">Reset Data</string>
     <string name="service_based_approach">Service Based Approach</string>
     <string name="broadcast_based_approach">Broadcast Based Approach</string>
+    <string name="launch_bill_board">Launch Bill Board</string>
 </resources>

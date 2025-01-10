@@ -3,7 +3,7 @@
 ## Introduction
 
 The PLM Sample App demonstrates the implementation of triggers to manage loyalty points
-for customers based on their payment transactions my mocking the data.
+for customers based on their payment transactions by mocking the data.
 
 ## Table of Contents
 
@@ -46,7 +46,7 @@ git clone https://github.com/koti-pl/PLSample.git
    payment loyalty app. It prompts the app to query its available rewards associated with the
    specific card. This ensures that users are promptly notified of any potential rewards or benefits
    they can avail themselves of with their authenticated card, enhancing the overall user experience
-   and Motivating card usage.
+   and motivating card usage.
 
 3. **Post Transaction(T3):** Following the completion of a transaction, this trigger need to send.
    Its

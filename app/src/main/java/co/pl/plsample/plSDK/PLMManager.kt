@@ -154,6 +154,28 @@ fun openPLMApp(
     return false
 }
 
+/**
+ * Opens the Payment Loyalty Module (PLM) app with specified parameters.
+ *
+ * @param launcher The activity result launcher for handling the result of the PLM app launch.
+ * @return Boolean indicating whether the PLM app launch was successful or not.
+ */
+fun openBillBoardApp(
+    launcher: ActivityResultLauncher<Intent>
+): Boolean {
+    try {
+        val intent = Intent(PLIntentsFilters.OPEN_BILLBOARD_ACTION).apply {
+            flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+            setPackage(PLIntentsFilters.BILLBOARD_APP_ID)
+        }
+        launcher.launch(intent)
+        return true
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return false
+}
+
 
 /**
  * Checks if the Payment Loyalty Module (PLM) app is installed on the device.
@@ -169,4 +191,20 @@ fun openPLMApp(
  * */
 fun isPLMInstalled(packageManager: PackageManager): Boolean {
     return packageManager.getLaunchIntentForPackage(PLIntentsFilters.PAYMENT_LOYALTY_APP_ID) != null
+}
+
+/**
+ * Checks if the Bill Board app is installed on the device.
+ *
+ * @param packageManager The PackageManager instance used to query information about installed packages.
+ * @return Boolean indicating whether the BILL Board app is installed on the device.
+ */
+/**
+ * Note : Declare Bill Board app package to whitelist app to query
+ *     <queries>
+ *         <package android:name="co.pl.billboard" />
+ *     </queries>
+ * */
+fun isBillBoardInstalled(packageManager: PackageManager): Boolean {
+    return packageManager.getLaunchIntentForPackage(PLIntentsFilters.BILLBOARD_APP_ID) != null
 }
