@@ -40,9 +40,23 @@
         android:text="@string/broadcast_based_approach"
         android:textColor="@color/black"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/launchBillBoard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/serviceBased" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/launchBillBoard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_button_bg"
+        android:padding="@dimen/spaceMedium"
+        android:text="@string/launch_bill_board"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/broadcastBased" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

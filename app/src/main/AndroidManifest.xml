@@ -5,6 +5,7 @@
     <queries>
         <!-- Declare PL app package to whitelist app to query -->
         <package android:name="com.winloyalty" />
+        <package android:name="co.pl.billboard" />
     </queries>
 
     <application

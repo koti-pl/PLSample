@@ -3,13 +3,23 @@ package co.pl.plsample
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
+import co.pl.plsample.plSDK.isBillBoardInstalled
+import co.pl.plsample.plSDK.openBillBoardApp
 import kotlin.system.exitProcess
 
 class SampleLauncherActivity : AppCompatActivity() {
+    private val TAG = "SampleLauncherActivity"
+    var activityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            Log.i(TAG, "Not implemented yet")
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -31,6 +41,12 @@ class SampleLauncherActivity : AppCompatActivity() {
         }
         findViewById<AppCompatButton>(R.id.broadcastBased).setOnClickListener {
             startActivity(Intent(this, BroadcastBasedIntegrationActivity::class.java))
+        }
+
+        findViewById<AppCompatButton>(R.id.launchBillBoard).setOnClickListener {
+            if(isBillBoardInstalled(packageManager)){
+                openBillBoardApp(activityResultLauncher)
+            }
         }
     }
 }
